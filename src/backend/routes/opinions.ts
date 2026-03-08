@@ -1,19 +1,31 @@
 import express from "express";
 import db from "../db";
-import { authenticateToken } from "../middleware/auth";
+import { authenticate } from "../middleware/auth";
 
 const router = express.Router();
 
 // List all opinions
-router.get("/", authenticateToken, (req, res) => {
+router.get("/", authenticate, (req, res) => {
   try {
-    const opinions = db.prepare(`
+    const { id, type } = (req as any).user;
+    
+    let query = `
       SELECT p.*, u.nome as autor_nome 
       FROM pareceres p
       JOIN usuarios u ON p.consultor_id = u.id
-      ORDER BY p.data_criacao DESC
-    `).all();
-    res.json(opinions);
+    `;
+    
+    let params: any[] = [];
+    
+    if (type === 'client') {
+      query += " WHERE p.cliente_id = ?";
+      params.push(id);
+    }
+    
+    query += " ORDER BY p.data_criacao DESC";
+    
+    const opinions = db.prepare(query).all(...params);
+    res.json(opinions || []);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao buscar pareceres" });
@@ -21,7 +33,7 @@ router.get("/", authenticateToken, (req, res) => {
 });
 
 // Create opinion
-router.post("/", authenticateToken, (req, res) => {
+router.post("/", authenticate, (req, res) => {
   const { cliente_id, conteudo, status_resultado } = req.body;
   const consultor_id = (req as any).user.id;
   try {

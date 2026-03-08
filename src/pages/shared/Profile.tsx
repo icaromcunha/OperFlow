@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion } from "motion/react";
 import { 
   User, 
@@ -14,23 +14,54 @@ import {
   Smartphone,
   CheckCircle2,
   ChevronLeft,
-  Upload
+  Upload,
+  MessageSquare,
+  Bell,
+  Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
 
 export default function UserProfile({ user, onUpdateUser }: { user: any; onUpdateUser: (userData: any) => void }) {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nome: user.nome,
     empresa: user.empresa || "OperFlow Solutions",
     email: user.email,
+    telefone: user.telefone || "",
+    whatsapp_numero: user.whatsapp_numero || "",
+    whatsapp_notificacoes_ativas: user.whatsapp_notificacoes_ativas === 1,
     senha: "",
     novaSenha: "",
     confirmarSenha: ""
   });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user.type === 'client') {
+        try {
+          const response = await api.get("/clients/me");
+          if (response.data) {
+            setFormData(prev => ({
+              ...prev,
+              nome: response.data.nome,
+              email: response.data.email,
+              telefone: response.data.telefone || "",
+              whatsapp_numero: response.data.whatsapp_numero || "",
+              whatsapp_notificacoes_ativas: response.data.whatsapp_notificacoes_ativas === 1
+            }));
+          }
+        } catch (err) {
+          console.error("Erro ao buscar perfil:", err);
+        }
+      }
+    };
+    fetchProfile();
+  }, [user.type]);
 
   const marketplaceAvatars = [
     { id: 'rocket', icon: Rocket, label: 'Foguete', color: 'bg-blue-500', url: 'https://img.icons8.com/color/200/rocket.png' },
@@ -49,7 +80,6 @@ export default function UserProfile({ user, onUpdateUser }: { user: any; onUpdat
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Limit size to 2MB
       if (file.size > 2 * 1024 * 1024) {
         alert("O arquivo é muito grande. O limite é 2MB.");
         return;
@@ -64,12 +94,36 @@ export default function UserProfile({ user, onUpdateUser }: { user: any; onUpdat
     }
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate save
-    onUpdateUser({ ...user, nome: formData.nome, empresa: formData.empresa, email: formData.email });
-    setIsEditing(false);
-    alert("Perfil atualizado com sucesso!");
+    setLoading(true);
+    try {
+      if (user.type === 'client') {
+        await api.patch("/clients/me", {
+          nome: formData.nome,
+          email: formData.email,
+          telefone: formData.telefone,
+          whatsapp_numero: formData.whatsapp_numero,
+          whatsapp_notificacoes_ativas: formData.whatsapp_notificacoes_ativas
+        });
+      }
+      
+      onUpdateUser({ 
+        ...user, 
+        nome: formData.nome, 
+        empresa: formData.empresa, 
+        email: formData.email,
+        whatsapp_numero: formData.whatsapp_numero,
+        whatsapp_notificacoes_ativas: formData.whatsapp_notificacoes_ativas ? 1 : 0
+      });
+      setIsEditing(false);
+      alert("Perfil atualizado com sucesso!");
+    } catch (err) {
+      console.error("Erro ao salvar perfil:", err);
+      alert("Erro ao salvar perfil.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -214,6 +268,53 @@ export default function UserProfile({ user, onUpdateUser }: { user: any; onUpdat
                 />
               </div>
 
+              {/* WhatsApp Notifications Section (Client Only) */}
+              {user.type === 'client' && (
+                <div className="pt-8 border-t border-slate-100 dark:border-slate-800 space-y-6">
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Bell className="text-primary size-4" />
+                    Notificações
+                  </h4>
+                  
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <MessageSquare size={14} /> WhatsApp para notificações
+                      </label>
+                      <input 
+                        type="text"
+                        placeholder="+55 11 99999-9999"
+                        disabled={!isEditing}
+                        value={formData.whatsapp_numero}
+                        onChange={(e) => setFormData({...formData, whatsapp_numero: e.target.value})}
+                        className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-primary transition-all disabled:opacity-60"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                      <div>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">Receber atualizações via WhatsApp</p>
+                        <p className="text-xs text-slate-500">Quando ativado, você receberá atualizações automáticas de seus protocolos diretamente no WhatsApp.</p>
+                      </div>
+                      <button
+                        type="button"
+                        disabled={!isEditing}
+                        onClick={() => setFormData({...formData, whatsapp_notificacoes_ativas: !formData.whatsapp_notificacoes_ativas})}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 ${
+                          formData.whatsapp_notificacoes_ativas ? 'bg-primary' : 'bg-slate-300 dark:bg-slate-700'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            formData.whatsapp_notificacoes_ativas ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="pt-8 border-t border-slate-100 dark:border-slate-800 space-y-6">
                 <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <Lock className="text-primary size-4" />
@@ -246,9 +347,11 @@ export default function UserProfile({ user, onUpdateUser }: { user: any; onUpdat
                 <div className="flex gap-4 pt-4">
                   <button 
                     type="submit"
-                    className="flex-1 py-4 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
+                    disabled={loading}
+                    className="flex-1 py-4 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    <CheckCircle2 size={20} /> Salvar Alterações
+                    {loading ? <Loader2 size={20} className="animate-spin" /> : <CheckCircle2 size={20} />}
+                    {loading ? "Salvando..." : "Salvar Alterações"}
                   </button>
                   <button 
                     type="button"

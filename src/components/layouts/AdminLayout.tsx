@@ -47,22 +47,21 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
 
   const menuItems = [
     { path: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { path: "/admin/queue", label: "Global Queue", icon: Layers },
-    { path: "/admin/clients", label: "Clients", icon: Store },
-    { path: "/admin/protocols", label: "Protocols", icon: FileText },
-    { path: "/admin/insights", label: "Insights", icon: Lightbulb },
-    { path: "/admin/reports", label: "Reports", icon: BarChart3 },
-    { path: "/admin/team", label: "Team", icon: Users },
-    { path: "/admin/settings", label: "Settings", icon: Settings },
+    { path: "/admin/queue", label: "Protocolos e Fila", icon: Layers },
+    { path: "/admin/clients", label: "Clientes", icon: Store },
+    ...(user.perfil === 'admin' ? [
+      { path: "/admin/team", label: "Equipe", icon: Users },
+      { path: "/admin/settings", label: "Configurações", icon: Settings },
+    ] : []),
   ];
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-[#101622] font-sans transition-colors duration-200">
+    <div className="flex h-screen bg-bg-main font-sans transition-colors duration-200 text-text-primary">
       {/* Sidebar */}
       <motion.aside 
         initial={false}
         animate={{ width: isCollapsed ? 80 : 256 }}
-        className="bg-[#1E293B] dark:bg-[#0F172A] text-white flex flex-col fixed h-full z-50 transition-colors duration-200 overflow-hidden"
+        className="bg-bg-main border-r border-border-main text-white flex flex-col fixed h-full z-50 transition-colors duration-200 overflow-hidden"
       >
         <div className="p-6 flex items-center justify-between">
           <AnimatePresence mode="wait">
@@ -73,16 +72,16 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                 exit={{ opacity: 0, x: -20 }}
                 className="flex items-center gap-3 overflow-hidden whitespace-nowrap"
               >
-                <div className="size-10 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20 shrink-0">
-                  <Rocket className="text-primary size-6" />
+                <div className="size-10 bg-gradient-to-br from-brand-orange to-brand-purple rounded-xl flex items-center justify-center shadow-lg shadow-brand-orange/20 shrink-0">
+                  <Rocket className="text-white size-6" />
                 </div>
-                <span className="font-bold text-xl tracking-tight uppercase italic">OperFlow</span>
+                <span className="font-bold text-xl tracking-tight uppercase italic text-white">OperFlow</span>
               </motion.div>
             )}
           </AnimatePresence>
           {isCollapsed && (
-            <div className="size-10 bg-accent rounded-xl flex items-center justify-center shadow-lg shadow-accent/20 mx-auto">
-              <Rocket className="text-primary size-6" />
+            <div className="size-10 bg-gradient-to-br from-brand-orange to-brand-purple rounded-xl flex items-center justify-center shadow-lg shadow-brand-orange/20 mx-auto">
+              <Rocket className="text-white size-6" />
             </div>
           )}
         </div>
@@ -94,11 +93,11 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="p-4 bg-white/5 rounded-xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
+                className="p-4 bg-white/5 rounded-xl border border-border-main cursor-pointer hover:bg-white/10 transition-colors"
                 onClick={() => navigate("/admin/profile")}
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="size-8 rounded-full bg-slate-500 overflow-hidden border border-white/20">
+                  <div className="size-8 rounded-full bg-slate-700 overflow-hidden border border-white/20">
                     {user.avatar ? (
                       <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
@@ -107,10 +106,10 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold text-white truncate">{user.nome}</p>
-                    <p className="text-[9px] text-slate-400 uppercase tracking-wider">Consultor</p>
+                    <p className="text-[9px] text-text-secondary uppercase tracking-wider">{user.perfil === 'admin' ? 'Administrador' : 'Consultor Estratégico'}</p>
                   </div>
                 </div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">ID: {user.id || '8902134'}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-text-secondary">ID: {user.id || '8902134'}</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -126,11 +125,11 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                 title={isCollapsed ? item.label : ""}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${
                   isActive 
-                    ? "bg-accent text-primary font-bold shadow-lg shadow-accent/10" 
-                    : "text-slate-400 hover:bg-white/5 hover:text-white"
+                    ? "bg-brand-purple text-white font-bold shadow-lg shadow-brand-purple/20" 
+                    : "text-text-secondary hover:bg-white/5 hover:text-white"
                 }`}
               >
-                <item.icon size={20} className={isActive ? "text-primary shrink-0" : "text-slate-400 group-hover:text-white shrink-0"} />
+                <item.icon size={20} className={isActive ? "text-white shrink-0" : "text-text-secondary group-hover:text-white shrink-0"} />
                 <AnimatePresence>
                   {!isCollapsed && (
                     <motion.span
@@ -152,16 +151,16 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
         <div className="px-4 mb-4">
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="w-full flex items-center justify-center p-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all"
+            className="w-full flex items-center justify-center p-3 rounded-xl bg-white/5 hover:bg-white/10 text-text-secondary hover:text-white transition-all"
           >
             {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
           </button>
         </div>
 
-        <div className="p-4 border-t border-white/5">
+        <div className="p-4 border-t border-border-main">
           <button
             onClick={onLogout}
-            className={`flex items-center gap-3 px-4 py-3 w-full rounded-xl text-slate-400 hover:text-red-400 hover:bg-white/5 transition-all ${isCollapsed ? 'justify-center' : ''}`}
+            className={`flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:text-brand-orange hover:bg-white/5 transition-all ${isCollapsed ? 'justify-center' : ''}`}
           >
             <LogOut size={20} />
             {!isCollapsed && <span className="text-sm font-medium">Sair do Portal</span>}
@@ -175,86 +174,89 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
         animate={{ marginLeft: isCollapsed ? 80 : 256 }}
         className="flex-1 flex flex-col min-h-screen transition-all duration-200"
       >
-        <header className="h-20 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#101622]/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-40">
+        <header className="h-20 border-b border-border-main bg-bg-main/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-40">
           <div className="flex items-center gap-4 flex-1 max-w-xl">
             <div className="relative w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 size-5" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary size-5" />
               <input
                 type="text"
                 placeholder="Pesquisar operações, lojistas ou SKUs..."
-                className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl pl-12 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-accent transition-all text-slate-900 dark:text-white"
+                className="w-full bg-bg-card border border-border-main rounded-xl pl-12 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-purple transition-all text-white placeholder:text-text-secondary"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <button
-              onClick={toggleDarkMode}
-              className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-            >
-              <Sun className="hidden dark:block" size={22} />
-              <Moon className="block dark:hidden" size={22} />
-            </button>
-            
+            <div className="relative">
+              <button 
+                onClick={toggleDarkMode}
+                className="p-2.5 rounded-xl bg-bg-card border border-border-main text-text-secondary hover:bg-white/5 transition-colors"
+                title="Alternar tema"
+              >
+                <Sun className="hidden dark:block size-5" />
+                <Moon className="block dark:hidden size-5" />
+              </button>
+            </div>
+
             <div className="relative">
               <button 
                 onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 relative hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                className="p-2.5 rounded-xl bg-bg-card border border-border-main text-text-secondary relative hover:bg-white/5 transition-colors"
               >
                 <Bell size={22} />
-                <span className="absolute top-2 right-2 size-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#101622]"></span>
+                <span className="absolute top-2 right-2 size-2.5 bg-brand-orange rounded-full border-2 border-bg-main"></span>
               </button>
 
               <AnimatePresence>
                 {isNotificationsOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setIsNotificationsOpen(false)}></div>
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 z-50 overflow-hidden"
-                    >
-                      <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
-                        <h4 className="font-bold text-slate-900 dark:text-white">Notificações Admin</h4>
-                        <span className="text-[10px] font-black uppercase text-primary bg-accent px-2 py-0.5 rounded-full">3 Novas</span>
+              <motion.div 
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                className="absolute right-0 mt-2 w-80 bg-bg-card rounded-2xl shadow-2xl border border-border-main z-50 overflow-hidden"
+              >
+                <div className="p-4 border-b border-border-main flex justify-between items-center bg-white/5">
+                  <h4 className="font-bold text-white">Notificações Admin</h4>
+                  <span className="text-[10px] font-black uppercase text-white bg-brand-purple px-2 py-0.5 rounded-full">3 Novas</span>
+                </div>
+                <div className="max-h-96 overflow-y-auto">
+                  {notifications.map((n) => (
+                    <div key={n.id} className="p-4 border-b border-border-main hover:bg-white/5 transition-colors cursor-pointer group">
+                      <div className="flex gap-3">
+                        <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${
+                          n.type === 'alert' ? 'bg-red-500/10 text-red-500' : 
+                          n.type === 'success' ? 'bg-green-500/10 text-green-500' : 
+                          'bg-brand-purple/10 text-brand-purple'
+                        }`}>
+                          {n.type === 'alert' ? <AlertCircle size={16} /> : 
+                           n.type === 'success' ? <CheckCircle2 size={16} /> : 
+                           <Info size={16} />}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs font-bold text-white group-hover:text-brand-orange transition-colors">{n.title}</p>
+                          <p className="text-[11px] text-text-secondary mt-0.5 leading-relaxed">{n.message}</p>
+                          <p className="text-[9px] text-text-secondary/50 mt-2 font-medium uppercase tracking-wider">{n.time}</p>
+                        </div>
                       </div>
-                      <div className="max-h-96 overflow-y-auto">
-                        {notifications.map((n) => (
-                          <div key={n.id} className="p-4 border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
-                            <div className="flex gap-3">
-                              <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${
-                                n.type === 'alert' ? 'bg-red-100 text-red-600' : 
-                                n.type === 'success' ? 'bg-green-100 text-green-600' : 
-                                'bg-blue-100 text-blue-600'
-                              }`}>
-                                {n.type === 'alert' ? <AlertCircle size={16} /> : 
-                                 n.type === 'success' ? <CheckCircle2 size={16} /> : 
-                                 <Info size={16} />}
-                              </div>
-                              <div className="flex-1">
-                                <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">{n.title}</p>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{n.message}</p>
-                                <p className="text-[9px] text-slate-400 mt-2 font-medium uppercase tracking-wider">{n.time}</p>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <button className="w-full py-3 text-xs font-bold text-slate-500 hover:text-primary transition-colors bg-slate-50/50 dark:bg-slate-800/50">
-                        Ver todas as notificações
-                      </button>
-                    </motion.div>
+                    </div>
+                  ))}
+                </div>
+                <button className="w-full py-3 text-xs font-bold text-text-secondary hover:text-white transition-colors bg-white/5">
+                  Ver todas as notificações
+                </button>
+              </motion.div>
                   </>
                 )}
               </AnimatePresence>
             </div>
 
-            <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2"></div>
+            <div className="h-8 w-[1px] bg-border-main mx-2"></div>
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => navigate("/admin/profile")}
-                className="size-10 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center justify-center text-primary font-bold overflow-hidden hover:border-accent transition-colors"
+                className="size-10 rounded-full border border-border-main bg-bg-card flex items-center justify-center text-white font-bold overflow-hidden hover:border-brand-orange transition-colors"
               >
                 {user.avatar ? (
                   <img 
@@ -264,14 +266,14 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <Settings size={22} className="text-slate-500" />
+                  <Settings size={22} className="text-text-secondary" />
                 )}
               </button>
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-8">
+        <main className="flex-1 overflow-y-auto p-8 bg-bg-main">
           <Outlet />
         </main>
       </motion.div>

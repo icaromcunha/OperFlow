@@ -16,10 +16,10 @@ export default function Insights() {
   const recommendations = [
     {
       id: 1,
-      title: "Increase stock for top selling items",
-      description: "Based on current sales velocity, 4 items from 'E-Shop Pro' will be out of stock in 5 days.",
+      title: "Aumentar estoque para itens mais vendidos",
+      description: "Com base na velocidade de vendas atual, 4 itens da 'E-Shop Pro' ficarão sem estoque em 5 dias.",
       client: "E-Shop Pro",
-      impact: "High",
+      impact: "Alto",
       type: "inventory",
       icon: Package,
       color: "text-blue-500",
@@ -27,10 +27,10 @@ export default function Insights() {
     },
     {
       id: 2,
-      title: "Improve listing quality",
-      description: "12 listings in 'Mega Store' have a quality score below 60%. Improving photos could boost conversion by 15%.",
+      title: "Melhorar qualidade dos anúncios",
+      description: "12 anúncios na 'Mega Store' têm pontuação de qualidade abaixo de 60%. Melhorar as fotos pode aumentar a conversão em 15%.",
       client: "Mega Store",
-      impact: "Medium",
+      impact: "Médio",
       type: "quality",
       icon: Star,
       color: "text-amber-500",
@@ -38,10 +38,10 @@ export default function Insights() {
     },
     {
       id: 3,
-      title: "Optimize ads",
-      description: "ACoS in 'Tech Hub' Amazon campaigns is above 25%. Consider pausing low-performing keywords.",
+      title: "Otimizar campanhas de Ads",
+      description: "O ACoS nas campanhas Amazon da 'Tech Hub' está acima de 25%. Considere pausar palavras-chave de baixo desempenho.",
       client: "Tech Hub",
-      impact: "High",
+      impact: "Alto",
       type: "ads",
       icon: BarChart3,
       color: "text-purple-500",
@@ -49,10 +49,10 @@ export default function Insights() {
     },
     {
       id: 4,
-      title: "Check logistics delays",
-      description: "Average shipping time for 'Global Trade' increased by 12h this week. Potential impact on ML reputation.",
+      title: "Verificar atrasos logísticos",
+      description: "O tempo médio de envio para 'Global Trade' aumentou 12h esta semana. Potencial impacto na reputação do ML.",
       client: "Global Trade",
-      impact: "Critical",
+      impact: "Crítico",
       type: "logistics",
       icon: Truck,
       color: "text-red-500",
@@ -66,13 +66,13 @@ export default function Insights() {
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
             <Sparkles className="text-primary" />
-            Strategic Insights
+            Insights Estratégicos
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 font-medium italic">AI-powered recommendations for marketplace optimization</p>
+          <p className="text-slate-500 dark:text-slate-400 font-medium italic">Recomendações baseadas em IA para otimização de marketplace</p>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-xl text-primary font-bold text-sm">
           <Zap size={18} />
-          AI Engine Active
+          Motor de IA Ativo
         </div>
       </div>
 
@@ -85,11 +85,11 @@ export default function Insights() {
                   <rec.icon size={24} />
                 </div>
                 <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${
-                  rec.impact === 'Critical' ? 'bg-red-100 text-red-700' : 
-                  rec.impact === 'High' ? 'bg-amber-100 text-amber-700' : 
+                  rec.impact === 'Crítico' ? 'bg-red-100 text-red-700' : 
+                  rec.impact === 'Alto' ? 'bg-amber-100 text-amber-700' : 
                   'bg-blue-100 text-blue-700'
                 }`}>
-                  {rec.impact} Impact
+                  Impacto {rec.impact}
                 </span>
               </div>
               
@@ -108,7 +108,7 @@ export default function Insights() {
                   <span className="text-xs font-bold text-slate-500">{rec.client}</span>
                 </div>
                 <button className="flex items-center gap-1 text-xs font-bold text-primary hover:gap-2 transition-all">
-                  Apply Strategy <ArrowRight size={14} />
+                  Aplicar Estratégia <ArrowRight size={14} />
                 </button>
               </div>
             </div>
@@ -119,26 +119,26 @@ export default function Insights() {
       {/* Performance Summary */}
       <div className="bg-slate-900 dark:bg-slate-950 rounded-2xl p-8 text-white relative overflow-hidden">
         <div className="relative z-10">
-          <h2 className="text-2xl font-bold mb-4">AI Performance Summary</h2>
+          <h2 className="text-2xl font-bold mb-4">Resumo de Performance da IA</h2>
           <p className="text-slate-400 max-w-2xl mb-8">
-            Our strategic engine has analyzed over 15,000 transactions this week. Implementing these recommendations could result in a potential revenue increase of <span className="text-green-400 font-bold">18.5%</span> across your portfolio.
+            Nosso motor estratégico analisou mais de 15.000 transações esta semana. A implementação destas recomendações pode resultar em um aumento potencial de receita de <span className="text-green-400 font-bold">18.5%</span> em seu portfólio.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
               <p className="text-3xl font-bold">84%</p>
-              <p className="text-xs text-slate-500 uppercase font-black tracking-widest mt-1">Accuracy</p>
+              <p className="text-xs text-slate-500 uppercase font-black tracking-widest mt-1">Precisão</p>
             </div>
             <div>
               <p className="text-3xl font-bold">12</p>
-              <p className="text-xs text-slate-500 uppercase font-black tracking-widest mt-1">Active Insights</p>
+              <p className="text-xs text-slate-500 uppercase font-black tracking-widest mt-1">Insights Ativos</p>
             </div>
             <div>
               <p className="text-3xl font-bold">R$ 42k</p>
-              <p className="text-xs text-slate-500 uppercase font-black tracking-widest mt-1">Potential Lift</p>
+              <p className="text-xs text-slate-500 uppercase font-black tracking-widest mt-1">Ganhos Potenciais</p>
             </div>
             <div>
               <p className="text-3xl font-bold">92%</p>
-              <p className="text-xs text-slate-500 uppercase font-black tracking-widest mt-1">Client Satisfaction</p>
+              <p className="text-xs text-slate-500 uppercase font-black tracking-widest mt-1">Satisfação do Cliente</p>
             </div>
           </div>
         </div>

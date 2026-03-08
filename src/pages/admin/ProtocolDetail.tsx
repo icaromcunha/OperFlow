@@ -3,6 +3,24 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { 
+  MessageSquare, 
+  Send, 
+  Clock, 
+  CheckCircle2, 
+  AlertCircle, 
+  User, 
+  ShieldCheck,
+  Smartphone,
+  Loader2,
+  MoreVertical,
+  Paperclip,
+  EyeOff,
+  History,
+  ChevronLeft,
+  ChevronDown,
+  Settings
+} from "lucide-react";
 
 export default function ProtocolDetail() {
   const { id } = useParams();
@@ -10,6 +28,8 @@ export default function ProtocolDetail() {
   const [protocol, setProtocol] = useState<any>(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
 
   const fetchProtocol = async () => {
     try {
@@ -26,15 +46,30 @@ export default function ProtocolDetail() {
     fetchProtocol();
   }, [id]);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendMessage = async (e?: React.FormEvent, sendWhatsApp: boolean = false) => {
+    if (e) e.preventDefault();
     if (!message.trim()) return;
+    
+    if (sendWhatsApp) setSendingWhatsApp(true);
+    else setSending(true);
+
     try {
-      await api.post(`/protocols/${id}/interactions`, { mensagem: message, visivel_cliente: true });
+      await api.post(`/protocols/${id}/interactions`, { 
+        mensagem: message, 
+        visivel_cliente: true,
+        send_whatsapp: sendWhatsApp
+      });
       setMessage("");
       fetchProtocol();
+      if (sendWhatsApp) {
+        alert("Atualização enviada ao cliente via WhatsApp.");
+      }
     } catch (err) {
       console.error(err);
+      alert("Erro ao enviar mensagem.");
+    } finally {
+      setSending(false);
+      setSendingWhatsApp(false);
     }
   };
 
@@ -49,34 +84,35 @@ export default function ProtocolDetail() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-full">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <Loader2 className="animate-spin text-primary" size={32} />
     </div>
   );
+
   if (!protocol) return (
     <div className="p-8 text-center">
-      <span className="material-symbols-outlined text-6xl text-slate-300 mb-4">error</span>
+      <AlertCircle className="text-6xl text-slate-300 mx-auto mb-4" />
       <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Protocolo não encontrado</h2>
       <button onClick={() => navigate(-1)} className="mt-4 text-primary font-bold hover:underline">Voltar</button>
     </div>
   );
 
   return (
-    <div className="p-8 space-y-8 text-slate-900 dark:text-white">
+    <div className="p-8 space-y-8 bg-bg-main min-h-screen text-text-primary">
       <div className="flex items-center justify-between">
         <button 
           onClick={() => navigate(-1)} 
-          className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-accent font-bold transition-colors group"
+          className="flex items-center gap-2 text-text-secondary hover:text-brand-orange font-bold transition-colors group"
         >
-          <span className="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>
+          <ChevronLeft size={20} className="transition-transform group-hover:-translate-x-1" />
           Voltar à Fila
         </button>
         <div className="flex items-center gap-3">
-          <span className="text-xs font-mono text-slate-400">ID: #OP-{protocol.id}</span>
+          <span className="text-xs font-mono text-text-secondary">ID: #OP-{protocol.id}</span>
           <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-            protocol.status === 'aberto' ? 'bg-blue-100 text-blue-700 border-blue-200' :
-            protocol.status === 'em atendimento' ? 'bg-amber-100 text-amber-700 border-amber-200' :
-            protocol.status === 'concluido' ? 'bg-green-100 text-green-700 border-green-200' :
-            'bg-slate-100 text-slate-600 border-slate-200'
+            protocol.status === 'aberto' ? 'bg-brand-orange/10 text-brand-orange border-brand-orange/20' :
+            protocol.status === 'em atendimento' ? 'bg-brand-purple/10 text-brand-purple border-brand-purple/20' :
+            protocol.status === 'concluido' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+            'bg-white/5 text-text-secondary border-border-main'
           }`}>
             {protocol.status}
           </div>
@@ -86,86 +122,121 @@ export default function ProtocolDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Column */}
         <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="bg-bg-card p-8 rounded-2xl border border-border-main shadow-sm">
             <div className="flex items-center gap-3 mb-4">
-              <span className="material-symbols-outlined text-primary">description</span>
-              <h1 className="text-2xl font-black tracking-tight">{protocol.titulo}</h1>
+              <div className="p-2 bg-brand-orange/10 text-brand-orange rounded-lg">
+                <AlertCircle size={20} />
+              </div>
+              <h1 className="text-2xl font-black tracking-tight text-white">{protocol.titulo}</h1>
             </div>
-            <p className="text-slate-600 dark:text-slate-400 leading-relaxed bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 italic">
+            <p className="text-text-secondary leading-relaxed bg-white/5 p-4 rounded-xl border border-border-main italic">
               "{protocol.descricao}"
             </p>
           </div>
 
-          {/* Interactions */}
+          {/* Interactions / Activity History */}
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-black uppercase tracking-wider flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">forum</span>
-                Histórico de Interações
+              <h3 className="text-lg font-black uppercase tracking-wider flex items-center gap-2 text-white">
+                <History className="text-brand-orange" size={20} />
+                Histórico de Atividades
               </h3>
-              <span className="text-xs text-slate-400 font-bold">{protocol.interactions.length} mensagens</span>
+              <span className="text-xs text-text-secondary font-bold">{protocol.interactions.length} eventos</span>
             </div>
             
-            <div className="space-y-6 relative before:absolute before:left-4 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-800">
-              {protocol.interactions.map((i: any) => (
-                <div key={i.id} className="relative pl-10">
-                  <div className={`absolute left-0 top-2 size-8 rounded-full border-4 border-white dark:border-slate-950 flex items-center justify-center text-white text-[10px] font-bold ${
-                    i.autor_tipo === 'admin' ? 'bg-primary' : 'bg-slate-400'
-                  }`}>
-                    <span className="material-symbols-outlined text-xs">
-                      {i.autor_tipo === 'admin' ? 'support_agent' : 'person'}
-                    </span>
-                  </div>
-                  <div className={`p-5 rounded-2xl shadow-sm border ${
-                    i.autor_tipo === 'admin' 
-                      ? 'bg-primary/5 border-primary/10 dark:bg-primary/10' 
-                      : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
-                  }`}>
-                    <div className="flex justify-between items-center mb-3">
-                      <span className={`text-[10px] font-black uppercase tracking-widest ${
-                        i.autor_tipo === 'admin' ? 'text-primary' : 'text-slate-500'
-                      }`}>
-                        {i.autor_nome} {i.autor_tipo === 'admin' && '(Consultor)'}
-                      </span>
-                      <span className="text-[10px] font-bold text-slate-400">
-                        {format(new Date(i.data_envio), "dd/MM HH:mm", { locale: ptBR })}
-                      </span>
+            <div className="space-y-6 relative before:absolute before:left-4 before:top-2 before:bottom-2 before:w-0.5 before:bg-border-main">
+              {protocol.interactions.map((i: any) => {
+                const isWhatsApp = i.mensagem.includes("WhatsApp");
+                const isStatusChange = i.mensagem.includes("Status alterado");
+                
+                return (
+                  <div key={i.id} className="relative pl-10">
+                    <div className={`absolute left-0 top-2 size-8 rounded-full border-4 border-bg-main flex items-center justify-center text-white text-[10px] font-bold ${
+                      isWhatsApp ? 'bg-emerald-500' :
+                      isStatusChange ? 'bg-amber-500' :
+                      i.autor_tipo === 'admin' ? 'bg-brand-orange' : 'bg-text-secondary'
+                    }`}>
+                      {isWhatsApp ? <Smartphone size={14} /> :
+                       isStatusChange ? <CheckCircle2 size={14} /> :
+                       i.autor_tipo === 'admin' ? <ShieldCheck size={14} /> : <User size={14} />}
                     </div>
-                    <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{i.mensagem}</p>
+                    <div className={`p-5 rounded-2xl shadow-sm border ${
+                      isWhatsApp || isStatusChange
+                        ? 'bg-white/5 border-border-main'
+                        : i.autor_tipo === 'admin' 
+                          ? 'bg-brand-orange/5 border-brand-orange/10' 
+                          : 'bg-bg-card border-border-main'
+                    }`}>
+                      <div className="flex justify-between items-center mb-3">
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${
+                          isWhatsApp ? 'text-emerald-500' :
+                          isStatusChange ? 'text-amber-500' :
+                          i.autor_tipo === 'admin' ? 'text-brand-orange' : 'text-text-secondary'
+                        }`}>
+                          {isWhatsApp ? 'Sistema (WhatsApp)' :
+                           isStatusChange ? 'Sistema (Status)' :
+                           `${i.autor_nome} ${i.autor_tipo === 'admin' ? '(Consultor)' : ''}`}
+                        </span>
+                        <span className="text-[10px] font-bold text-text-secondary">
+                          {format(new Date(i.data_envio), "dd/MM HH:mm", { locale: ptBR })}
+                        </span>
+                      </div>
+                      <p className={`text-sm leading-relaxed whitespace-pre-wrap ${
+                        isWhatsApp || isStatusChange ? 'text-text-secondary italic' : 'text-white'
+                      }`}>
+                        {i.mensagem}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
           {/* Reply Box */}
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl">
-            <form onSubmit={handleSendMessage} className="space-y-4">
+          <div className="bg-bg-card p-6 rounded-2xl border border-border-main shadow-xl">
+            <form onSubmit={(e) => handleSendMessage(e, false)} className="space-y-4">
               <div className="relative">
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Escreva seu parecer ou orientação estratégica..."
-                  className="w-full p-5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all resize-none text-slate-900 dark:text-white min-h-[120px]"
+                  className="w-full p-5 bg-white/5 border border-border-main rounded-xl text-sm focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all resize-none text-white min-h-[120px] placeholder:text-text-secondary/50"
                 />
                 <div className="absolute bottom-4 right-4 flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Pressione Ctrl+Enter para enviar</span>
+                  <span className="text-[10px] font-bold text-text-secondary uppercase">Pressione Ctrl+Enter para enviar</span>
                 </div>
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center flex-wrap gap-4">
                 <div className="flex gap-2">
-                  <button type="button" className="p-2.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-2">
-                    <span className="material-symbols-outlined">attach_file</span>
+                  <button type="button" className="p-2.5 text-text-secondary hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2">
+                    <Paperclip size={18} />
                     <span className="text-xs font-bold uppercase tracking-widest">Anexar</span>
                   </button>
-                  <button type="button" className="p-2.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-2">
-                    <span className="material-symbols-outlined">visibility_off</span>
+                  <button type="button" className="p-2.5 text-text-secondary hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2">
+                    <EyeOff size={18} />
                     <span className="text-xs font-bold uppercase tracking-widest">Nota Interna</span>
                   </button>
                 </div>
-                <button type="submit" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl font-black flex items-center gap-2 transition-all shadow-lg shadow-primary/20 uppercase tracking-widest text-xs">
-                  Enviar Parecer <span className="material-symbols-outlined text-sm">send</span>
-                </button>
+                <div className="flex gap-3">
+                  <button 
+                    type="button"
+                    disabled={sending || sendingWhatsApp || !message.trim()}
+                    onClick={() => handleSendMessage(undefined, true)}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-black flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20 uppercase tracking-widest text-xs disabled:opacity-50"
+                  >
+                    {sendingWhatsApp ? <Loader2 size={16} className="animate-spin" /> : <Smartphone size={16} />}
+                    Enviar via WhatsApp
+                  </button>
+                  <button 
+                    type="submit" 
+                    disabled={sending || sendingWhatsApp || !message.trim()}
+                    className="bg-gradient-to-r from-brand-orange to-brand-purple hover:from-brand-orange-light hover:to-brand-purple-light text-white px-8 py-3 rounded-xl font-black flex items-center gap-2 transition-all shadow-lg shadow-brand-orange/20 uppercase tracking-widest text-xs disabled:opacity-50"
+                  >
+                    {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                    Salvar Parecer
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -173,69 +244,69 @@ export default function ProtocolDetail() {
 
         {/* Sidebar Column */}
         <aside className="space-y-8">
-          <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-8">
+          <div className="bg-bg-card p-8 rounded-2xl border border-border-main shadow-sm space-y-8">
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                <span className="material-symbols-outlined text-xs">settings</span>
+              <label className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] flex items-center gap-2">
+                <Settings size={14} />
                 Gestão de Status
               </label>
               <div className="relative">
                 <select 
                   value={protocol.status}
                   onChange={(e) => updateStatus(e.target.value)}
-                  className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-900 dark:text-white appearance-none focus:ring-2 focus:ring-primary"
+                  className="w-full p-3 bg-white/5 border border-border-main rounded-xl text-sm font-bold text-white appearance-none focus:ring-2 focus:ring-brand-orange"
                 >
                   <option value="aberto">Aguardando Análise</option>
                   <option value="em atendimento">Em Revisão Estratégica</option>
                   <option value="aguardando cliente">Ação do Lojista</option>
                   <option value="concluido">Operação Finalizada</option>
                 </select>
-                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+                <ChevronDown size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none" />
               </div>
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                <span className="material-symbols-outlined text-xs">priority_high</span>
+              <label className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] flex items-center gap-2">
+                <AlertCircle size={14} />
                 Nível de Urgência
               </label>
-              <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+              <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-border-main">
                 <span className={`size-3 rounded-full shadow-sm ${
-                  protocol.prioridade_nome === 'Alta' ? 'bg-red-500 animate-pulse' :
-                  protocol.prioridade_nome === 'Média' ? 'bg-amber-500' : 'bg-blue-500'
+                  protocol.prioridade_name === 'Alta' ? 'bg-red-500 animate-pulse' :
+                  protocol.prioridade_name === 'Média' ? 'bg-amber-500' : 'bg-brand-orange'
                 }`}></span>
-                <span className="font-black uppercase tracking-wider text-xs">{protocol.prioridade_nome}</span>
+                <span className="font-black uppercase tracking-wider text-xs text-white">{protocol.prioridade_name}</span>
               </div>
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                <span className="material-symbols-outlined text-xs">business</span>
+            <div className="space-y-4 pt-4 border-t border-border-main">
+              <label className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] flex items-center gap-2">
+                <User size={14} />
                 Dados do Lojista
               </label>
               <div className="flex items-center gap-4">
-                <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-lg">
+                <div className="size-12 rounded-xl bg-brand-orange/10 flex items-center justify-center text-brand-orange font-black text-lg">
                   {protocol.cliente_nome.charAt(0)}
                 </div>
                 <div className="flex flex-col">
-                  <p className="text-sm font-black tracking-tight">{protocol.cliente_nome}</p>
-                  <p className="text-xs text-slate-500 font-medium">{protocol.cliente_email}</p>
+                  <p className="text-sm font-black tracking-tight text-white">{protocol.cliente_nome}</p>
+                  <p className="text-xs text-text-secondary font-medium">{protocol.cliente_email}</p>
                 </div>
               </div>
-              <button className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2">
-                <span className="material-symbols-outlined text-sm">history</span>
+              <button className="w-full py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2 border border-border-main">
+                <History size={16} />
                 Ver Histórico do Lojista
               </button>
             </div>
 
-            <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2 mb-3">
-                <span className="material-symbols-outlined text-xs text-red-500">timer</span>
+            <div className="pt-6 border-t border-border-main">
+              <label className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] flex items-center gap-2 mb-3">
+                <Clock size={14} className="text-red-500" />
                 SLA de Resposta
               </label>
               <div className="flex flex-col gap-1">
-                <span className="text-3xl font-black tracking-tighter text-red-600 dark:text-red-400">02:45:00</span>
-                <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <span className="text-3xl font-black tracking-tighter text-red-500">02:45:00</span>
+                <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
                   <div className="h-full bg-red-500 w-3/4"></div>
                 </div>
               </div>

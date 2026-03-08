@@ -17,6 +17,10 @@ import ClientList from "./pages/admin/ClientList";
 import GlobalQueue from "./pages/admin/GlobalQueue";
 import ClientProfile from "./pages/admin/ClientProfile";
 import Insights from "./pages/admin/Insights";
+import AdminReports from "./pages/admin/Reports";
+import AdminTeam from "./pages/admin/Team";
+import AdminSettings from "./pages/admin/Settings";
+import AdminLogin from "./pages/admin/Login";
 import ClientLogin from "./pages/client/Login";
 import ClientDashboard from "./pages/client/Dashboard";
 import CreateProtocol from "./pages/client/CreateProtocol";
@@ -60,12 +64,12 @@ export default function App() {
     <ThemeProvider>
       <BrowserRouter>
         <Routes>
-          {/* Unified Login Route */}
+          {/* Unified Login Routes */}
           <Route path="/login" element={<ClientLogin onLogin={handleLogin} />} />
-          <Route path="/admin/login" element={<Navigate to="/login" />} />
+          <Route path="/admin/login" element={<AdminLogin onLogin={handleLogin} />} />
 
           {/* Admin Routes */}
-          <Route path="/admin" element={user?.type === 'admin' ? <AdminLayout user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}>
+          <Route path="/admin" element={user?.type === 'admin' ? <AdminLayout user={user} onLogout={handleLogout} /> : <Navigate to="/admin/login" />}>
             <Route index element={<AdminDashboard />} />
             <Route path="queue" element={<GlobalQueue />} />
             <Route path="clients" element={<ClientList />} />
@@ -73,15 +77,18 @@ export default function App() {
             <Route path="protocols" element={<ProtocolList />} />
             <Route path="protocols/:id" element={<ProtocolDetail />} />
             <Route path="insights" element={<Insights />} />
-            <Route path="reports" element={<div className="p-8">Reports Page (Admin)</div>} />
-            <Route path="team" element={<div className="p-8">Team Management Page</div>} />
-            <Route path="settings" element={<div className="p-8">Admin Settings Page</div>} />
+            <Route path="reports" element={<AdminReports />} />
+            <Route path="team" element={<AdminTeam />} />
+            <Route path="settings" element={<AdminSettings />} />
             <Route path="profile" element={<UserProfile user={user} onUpdateUser={handleUpdateUser} />} />
           </Route>
 
           {/* Client Routes */}
-          <Route path="/login" element={<ClientLogin onLogin={handleLogin} />} />
-          <Route path="/" element={user?.type === 'client' ? <ClientLayout user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}>
+          <Route path="/" element={
+            !user ? <Navigate to="/login" /> :
+            user.type === 'admin' ? <Navigate to="/admin" /> :
+            <ClientLayout user={user} onLogout={handleLogout} />
+          }>
             <Route index element={<ClientDashboard />} />
             <Route path="reports" element={<Reports />} />
             <Route path="support" element={<Support />} />

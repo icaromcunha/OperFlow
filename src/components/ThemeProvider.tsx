@@ -33,10 +33,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return JSON.parse(saved);
       } catch (e) {
         console.error('Error parsing darkMode from localStorage', e);
-        return false;
+        return true;
       }
     }
-    return false;
+    return true;
   });
 
   useEffect(() => {

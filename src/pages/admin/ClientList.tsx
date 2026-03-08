@@ -1,37 +1,37 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import { useClients } from "../../hooks/useClients";
+import { StatusBadge } from "../../components/ui/StatusBadge";
 import { 
   Search, 
   UserPlus, 
   MoreVertical, 
   ExternalLink, 
-  CheckCircle2, 
-  AlertCircle, 
   Clock,
-  LayoutGrid,
-  ShieldCheck
+  LayoutGrid
 } from "lucide-react";
 
 export default function ClientList() {
-  const [clients, setClients] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { clients, loading, refresh: refreshClients } = useClients();
   const [filter, setFilter] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        const response = await api.get("/clients");
-        setClients(response.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchClients();
-  }, []);
+  const handleAddClient = async () => {
+    const nome = prompt("Nome do cliente:");
+    if (!nome) return;
+    const email = prompt("E-mail do cliente:");
+    if (!email) return;
+    
+    try {
+      await api.post("/clients", { nome, email, status: 'ativo' });
+      await refreshClients();
+      alert("Cliente adicionado com sucesso!");
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao adicionar cliente.");
+    }
+  };
 
   const filteredClients = clients.filter(c => 
     c.nome.toLowerCase().includes(filter.toLowerCase()) ||
@@ -48,11 +48,14 @@ export default function ClientList() {
     <div className="space-y-8">
       <div className="flex justify-between items-end">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Client Management</h1>
-          <p className="text-slate-500 dark:text-slate-400 font-medium italic">Monitor and manage marketplace partner accounts</p>
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Gestão de Clientes</h1>
+          <p className="text-slate-500 dark:text-slate-400 font-medium italic">Monitore e gerencie as contas dos parceiros de marketplace</p>
         </div>
-        <button className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20">
-          <UserPlus size={20} /> Add New Client
+        <button 
+          onClick={handleAddClient}
+          className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
+        >
+          <UserPlus size={20} /> Adicionar Novo Cliente
         </button>
       </div>
 
@@ -62,7 +65,7 @@ export default function ClientList() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 size-5" />
             <input
               type="text"
-              placeholder="Search by name, email or ID..."
+              placeholder="Buscar por nome, e-mail ou ID..."
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-white"
@@ -79,12 +82,12 @@ export default function ClientList() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest">
-                <th className="px-6 py-4">Client Name</th>
-                <th className="px-6 py-4">Active Channels</th>
-                <th className="px-6 py-4">Open Protocols</th>
-                <th className="px-6 py-4">Average SLA</th>
-                <th className="px-6 py-4">Account Health</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-6 py-4">Nome do Cliente</th>
+                <th className="px-6 py-4">Canais Ativos</th>
+                <th className="px-6 py-4">Protocolos Abertos</th>
+                <th className="px-6 py-4">Média SLA</th>
+                <th className="px-6 py-4">Saúde da Conta</th>
+                <th className="px-6 py-4 text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -101,7 +104,7 @@ export default function ClientList() {
                       </div>
                       <div className="flex flex-col">
                         <span className="font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">{c.nome}</span>
-                        <span className="text-[10px] text-slate-400 uppercase font-black">ID: #CLT-{c.id}</span>
+                        <span className="text-[10px] text-slate-400 font-black">ID: #CLT-{c.id}</span>
                       </div>
                     </div>
                   </td>
@@ -122,12 +125,7 @@ export default function ClientList() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-1.5 w-16 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-green-500 w-[85%]"></div>
-                      </div>
-                      <span className="text-xs font-bold text-green-600">Good</span>
-                    </div>
+                    <StatusBadge status={c.status} type="client" />
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">

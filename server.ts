@@ -1,5 +1,8 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import rateLimit from "express-rate-limit";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -13,6 +16,8 @@ import insightRoutes from "./src/backend/routes/insights";
 import configRoutes from "./src/backend/routes/config";
 import productRoutes from "./src/backend/routes/products";
 import opinionRoutes from "./src/backend/routes/opinions";
+import userRoutes from "./src/backend/routes/users";
+import evolutionRoutes from "./src/backend/routes/evolution";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,11 +26,28 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // Trust proxy for rate limiting behind nginx
+  app.set('trust proxy', 1);
+
   // Initialize Database
   initDb();
 
+  // Security Middleware
+  app.use(helmet({
+    contentSecurityPolicy: false, // Vite handles this in dev
+  }));
   app.use(cors());
-  app.use(express.json());
+  app.use(morgan('dev'));
+  app.use(express.json({ limit: '10mb' }));
+
+  // Rate Limiting
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: "Too many requests from this IP, please try again after 15 minutes",
+    validate: { trustProxy: false }, // Suppress validation warning as we already set trust proxy
+  });
+  app.use("/api/", limiter);
 
   // API Routes
   app.use("/api/auth", authRoutes);
@@ -37,10 +59,22 @@ async function startServer() {
   app.use("/api/config", configRoutes);
   app.use("/api/products", productRoutes);
   app.use("/api/opinions", opinionRoutes);
+  app.use("/api/users", userRoutes);
+  app.use("/api/evolution", evolutionRoutes);
 
   // Health check
   app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
+  // Global Error Handler
+  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    console.error(`[Error] ${err.stack}`);
+    res.status(err.status || 500).json({
+      error: process.env.NODE_ENV === 'production' 
+        ? "Internal Server Error" 
+        : err.message
+    });
   });
 
   // Vite middleware for development

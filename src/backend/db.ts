@@ -25,7 +25,8 @@ export function initDb() {
       nome TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
       senha TEXT NOT NULL,
-      perfil TEXT NOT NULL, -- 'admin', 'atendente'
+      perfil TEXT NOT NULL, -- 'admin', 'consultor'
+      status TEXT DEFAULT 'online',
       FOREIGN KEY (empresa_id) REFERENCES empresas(id)
     )
   `);
@@ -35,14 +36,34 @@ export function initDb() {
     CREATE TABLE IF NOT EXISTS clientes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       empresa_id INTEGER NOT NULL,
+      consultor_id INTEGER,
       nome TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
       senha TEXT NOT NULL,
       telefone TEXT,
+      whatsapp_numero TEXT,
+      whatsapp_notificacoes_ativas INTEGER DEFAULT 0,
       status TEXT DEFAULT 'ativo',
-      FOREIGN KEY (empresa_id) REFERENCES empresas(id)
+      FOREIGN KEY (empresa_id) REFERENCES empresas(id),
+      FOREIGN KEY (consultor_id) REFERENCES usuarios(id)
     )
   `);
+
+  // Migrations
+  try {
+    db.prepare("ALTER TABLE usuarios ADD COLUMN status TEXT DEFAULT 'online'").run();
+  } catch (e) {
+    // Column already exists
+  }
+  
+  try {
+    db.prepare("ALTER TABLE clientes ADD COLUMN consultor_id INTEGER").run();
+  } catch (e) {}
+
+  try {
+    db.prepare("ALTER TABLE clientes ADD COLUMN whatsapp_numero TEXT").run();
+    db.prepare("ALTER TABLE clientes ADD COLUMN whatsapp_notificacoes_ativas INTEGER DEFAULT 0").run();
+  } catch (e) {}
 
   // Categories
   db.exec(`
@@ -106,11 +127,26 @@ export function initDb() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       cliente_id INTEGER NOT NULL,
       nome TEXT NOT NULL, -- 'Mercado Livre', 'Amazon', 'Shopee'
-      status TEXT DEFAULT 'sincronizado',
-      estoque INTEGER DEFAULT 0,
-      fulfillment TEXT DEFAULT 'Inativo',
+      status TEXT DEFAULT 'ativo', -- 'ativo', 'inativo', 'pendente'
+      status_cor TEXT DEFAULT 'verde', -- 'verde', 'amarelo', 'vermelho'
+      estoque_tipo TEXT DEFAULT 'Full', -- 'Fulfillment', 'FBA', 'Full'
+      estoque_cor TEXT DEFAULT 'verde', -- 'verde', 'amarelo', 'vermelho'
       data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+    )
+  `);
+
+  // Evolution History
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS cliente_evolucao (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      cliente_id INTEGER NOT NULL,
+      consultor_id INTEGER NOT NULL,
+      titulo TEXT NOT NULL,
+      descricao TEXT NOT NULL,
+      data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+      FOREIGN KEY (consultor_id) REFERENCES usuarios(id)
     )
   `);
 
@@ -137,9 +173,30 @@ export function initDb() {
       cor_secundaria TEXT DEFAULT '#fbbf24',
       cor_fundo_claro TEXT DEFAULT '#f5f6f8',
       cor_fundo_escuro TEXT DEFAULT '#101622',
+      whatsapp_api_provider TEXT,
+      whatsapp_api_token TEXT,
+      whatsapp_numero_remetente TEXT,
+      whatsapp_webhook_url TEXT,
       FOREIGN KEY (empresa_id) REFERENCES empresas(id)
     )
   `);
+
+  // Migrations for existing tables
+  const tableInfoClientes = db.prepare("PRAGMA table_info(clientes)").all() as any[];
+  const hasWhatsappNumero = tableInfoClientes.some(col => col.name === 'whatsapp_numero');
+  if (!hasWhatsappNumero) {
+    db.exec("ALTER TABLE clientes ADD COLUMN whatsapp_numero TEXT");
+    db.exec("ALTER TABLE clientes ADD COLUMN whatsapp_notificacoes_ativas INTEGER DEFAULT 0");
+  }
+
+  const tableInfoConfig = db.prepare("PRAGMA table_info(configuracoes_whitelabel)").all() as any[];
+  const hasWhatsappProvider = tableInfoConfig.some(col => col.name === 'whatsapp_api_provider');
+  if (!hasWhatsappProvider) {
+    db.exec("ALTER TABLE configuracoes_whitelabel ADD COLUMN whatsapp_api_provider TEXT");
+    db.exec("ALTER TABLE configuracoes_whitelabel ADD COLUMN whatsapp_api_token TEXT");
+    db.exec("ALTER TABLE configuracoes_whitelabel ADD COLUMN whatsapp_numero_remetente TEXT");
+    db.exec("ALTER TABLE configuracoes_whitelabel ADD COLUMN whatsapp_webhook_url TEXT");
+  }
 
   // Products
   db.exec(`
@@ -188,7 +245,12 @@ export function initDb() {
   seedData();
 
   // Ensure Admin User exists (for demo purposes)
-  const hashedAdminPwd = bcrypt.hashSync("123456", 10);
+  const hashedAdminPwd = bcrypt.hashSync(process.env.ADMIN_PASSWORD || "Acesso@007", 10);
+  
+  // Update ALL existing users to the new password as requested
+  db.prepare("UPDATE usuarios SET senha = ?").run(hashedAdminPwd);
+  db.prepare("UPDATE clientes SET senha = ?").run(hashedAdminPwd);
+
   const adminUser = db.prepare("SELECT id FROM usuarios WHERE email = ?").get("admin@test.com") as any;
   if (!adminUser) {
     const company = db.prepare("SELECT id FROM empresas LIMIT 1").get() as any;
@@ -204,6 +266,29 @@ export function initDb() {
   } else {
     // Force update password to be sure
     db.prepare("UPDATE usuarios SET senha = ? WHERE email = ?").run(hashedAdminPwd, "admin@test.com");
+  }
+
+  // Ensure Consultant User exists
+  const consultUser = db.prepare("SELECT id FROM usuarios WHERE email = ?").get("consult@test.com") as any;
+  if (!consultUser) {
+    const company = db.prepare("SELECT id FROM empresas LIMIT 1").get() as any;
+    if (company) {
+      db.prepare("INSERT INTO usuarios (empresa_id, nome, email, senha, perfil) VALUES (?, ?, ?, ?, ?)").run(
+        company.id,
+        "Consultor Teste",
+        "consult@test.com",
+        hashedAdminPwd,
+        "consultor"
+      );
+    }
+  } else {
+    db.prepare("UPDATE usuarios SET senha = ? WHERE email = ?").run(hashedAdminPwd, "consult@test.com");
+  }
+
+  // Ensure Client User exists
+  const clientUser = db.prepare("SELECT id FROM clientes WHERE email = ?").get("cliente@test.com") as any;
+  if (clientUser) {
+    db.prepare("UPDATE clientes SET senha = ? WHERE email = ?").run(hashedAdminPwd, "cliente@test.com");
   }
 
   // Ensure specific categories exist for the first company
@@ -251,7 +336,8 @@ function seedData() {
   `).run(companyId, "OperFlow", "#0a47c2", "#fbbf24");
 
   // Create Admin User
-  const hashedAdminPwd = bcrypt.hashSync("123456", 10);
+  const hashedAdminPwd = bcrypt.hashSync(process.env.ADMIN_PASSWORD || "Acesso@007", 10);
+  const hashedClientPwd = bcrypt.hashSync(process.env.CLIENT_PASSWORD || "Acesso@007", 10);
   db.prepare("INSERT INTO usuarios (empresa_id, nome, email, senha, perfil) VALUES (?, ?, ?, ?, ?)").run(
     companyId,
     "Admin Teste",
@@ -260,20 +346,55 @@ function seedData() {
     "admin"
   );
 
-  // Create Client
-  const hashedClientPwd = bcrypt.hashSync("123456", 10);
-  const clientId = db.prepare("INSERT INTO clientes (empresa_id, nome, email, senha, telefone) VALUES (?, ?, ?, ?, ?)").run(
+  // Create Consultant User
+  const consultorId = db.prepare("INSERT INTO usuarios (empresa_id, nome, email, senha, perfil) VALUES (?, ?, ?, ?, ?)").run(
     companyId,
+    "Consultor Teste",
+    "consult@test.com",
+    hashedAdminPwd,
+    "consultor"
+  ).lastInsertRowid as number;
+
+  // Create Client
+  const clientId = db.prepare("INSERT INTO clientes (empresa_id, consultor_id, nome, email, senha, telefone) VALUES (?, ?, ?, ?, ?, ?)").run(
+    companyId,
+    consultorId,
     "Loja Exemplo",
     "cliente@test.com",
-    hashedClientPwd,
+    hashedAdminPwd,
     "11999999999"
   ).lastInsertRowid;
 
+  // Create 20 test clients for the consultant
+  for (let i = 1; i <= 20; i++) {
+    db.prepare("INSERT INTO clientes (empresa_id, consultor_id, nome, email, senha, telefone) VALUES (?, ?, ?, ?, ?, ?)").run(
+      companyId,
+      consultorId,
+      `Lojista de Teste ${i}`,
+      `lojista${i}@test.com`,
+      hashedClientPwd,
+      `1198888${i.toString().padStart(4, '0')}`
+    );
+  }
+
   // Create Channels for Client
-  db.prepare("INSERT INTO canais (cliente_id, nome, status, estoque, fulfillment) VALUES (?, ?, ?, ?, ?)").run(clientId, "Mercado Livre", "sincronizado", 890, "Ativo");
-  db.prepare("INSERT INTO canais (cliente_id, nome, status, estoque, fulfillment) VALUES (?, ?, ?, ?, ?)").run(clientId, "Amazon", "sincronizado", 450, "FBA: Sim");
-  db.prepare("INSERT INTO canais (cliente_id, nome, status, estoque, fulfillment) VALUES (?, ?, ?, ?, ?)").run(clientId, "Shopee", "sincronizado", 120, "Inativo");
+  db.prepare("INSERT INTO canais (cliente_id, nome, status, status_cor, estoque_tipo, estoque_cor) VALUES (?, ?, ?, ?, ?, ?)").run(clientId, "Mercado Livre", "ativo", "verde", "Full", "verde");
+  db.prepare("INSERT INTO canais (cliente_id, nome, status, status_cor, estoque_tipo, estoque_cor) VALUES (?, ?, ?, ?, ?, ?)").run(clientId, "Amazon", "pendente", "amarelo", "FBA", "verde");
+  db.prepare("INSERT INTO canais (cliente_id, nome, status, status_cor, estoque_tipo, estoque_cor) VALUES (?, ?, ?, ?, ?, ?)").run(clientId, "Shopee", "inativo", "vermelho", "Fulfillment", "vermelho");
+
+  // Create Evolution for Client
+  db.prepare("INSERT INTO cliente_evolucao (cliente_id, consultor_id, titulo, descricao) VALUES (?, ?, ?, ?)").run(
+    clientId,
+    consultorId,
+    "Início da Consultoria",
+    "O cliente iniciou com baixa performance em marketplaces secundários. Focamos na estruturação do Mercado Livre primeiro."
+  );
+  db.prepare("INSERT INTO cliente_evolucao (cliente_id, consultor_id, titulo, descricao) VALUES (?, ?, ?, ?)").run(
+    clientId,
+    consultorId,
+    "Otimização de Anúncios",
+    "Realizamos a revisão de 150 anúncios, melhorando títulos e descrições. O CTR aumentou em 25%."
+  );
 
   // Create Insight for Client
   db.prepare("INSERT INTO insights (cliente_id, titulo, descricao) VALUES (?, ?, ?)").run(

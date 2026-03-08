@@ -5,28 +5,51 @@ import {
   Share2, 
   Truck, 
   RefreshCw, 
+  Clock,
+  AlertCircle,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  MessageSquare,
+  TrendingUp,
+  ExternalLink
 } from "lucide-react";
 import api from "../../services/api";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+const MARKETPLACE_LOGOS: Record<string, string> = {
+  "Mercado Livre": "https://http2.mlstatic.com/frontend-assets/ui-navigation/5.19.1/mercadolibre/logo__large_plus.png",
+  "Amazon": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
+  "Shopee": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg",
+  "Magalu": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Magalu_logo.svg",
+  "Americanas": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Americanas_logo.svg"
+};
+
 export default function ClientDashboard() {
   const [protocols, setProtocols] = useState<any[]>([]);
   const [channels, setChannels] = useState<any[]>([]);
   const [insight, setInsight] = useState<any>(null);
+  const [evolution, setEvolution] = useState<any[]>([]);
+  const [detailedStats, setDetailedStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showAllEvolution, setShowAllEvolution] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [pRes, cRes, iRes] = await Promise.all([
+        const [pRes, cRes, iRes, eRes, sRes] = await Promise.all([
           api.get("/protocols"),
           api.get("/channels"),
-          api.get("/insights")
+          api.get("/insights"),
+          api.get("/evolution"),
+          api.get("/protocols/stats/detailed")
         ]);
         setProtocols(pRes.data);
         setChannels(cRes.data);
         setInsight(iRes.data);
+        setEvolution(eRes.data);
+        setDetailedStats(sRes.data);
       } catch (err) {
         console.error("Erro ao carregar dados do dashboard:", err);
       } finally {
@@ -36,212 +59,250 @@ export default function ClientDashboard() {
     fetchData();
   }, []);
 
+  const openProtocols = protocols.filter(p => p.status !== 'concluido');
+  const avgResponseTime = detailedStats?.avg_hours ? `${detailedStats.avg_hours.toFixed(1)}h` : "4.2h";
+
   if (loading) return (
     <div className="flex items-center justify-center h-96">
       <RefreshCw className="animate-spin text-primary" size={40} />
     </div>
   );
 
+  const getTrafficLightColor = (color: string) => {
+    switch (color) {
+      case 'verde': return 'bg-green-500';
+      case 'amarelo': return 'bg-yellow-500';
+      case 'vermelho': return 'bg-red-500';
+      default: return 'bg-white/20';
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-20 py-8 space-y-8">
-      {/* KPI Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-5">
-          <div className="size-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-            <BarChart3 size={30} />
+    <div className="max-w-7xl mx-auto space-y-8 pb-20 bg-bg-main text-text-primary">
+      {/* KPI Row */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-bg-card p-6 rounded-2xl border border-border-main shadow-sm hover:border-brand-orange/30 transition-colors group">
+          <div className="flex items-center justify-between mb-4">
+            <div className="size-10 rounded-xl bg-brand-orange/10 text-brand-orange flex items-center justify-center group-hover:scale-110 transition-transform">
+              <MessageSquare size={20} />
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Faturamento Mensal</p>
-            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">R$ 67.420,00</p>
-          </div>
+          <p className="text-xs font-black uppercase text-text-secondary tracking-widest">Protocolos Abertos</p>
+          <p className="text-3xl font-black text-white mt-1">{openProtocols.length}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-5">
-          <div className="size-12 rounded-lg bg-accent/20 text-yellow-700 dark:text-accent flex items-center justify-center">
-            <Share2 size={30} />
+
+        <div className="bg-bg-card p-6 rounded-2xl border border-border-main shadow-sm hover:border-brand-purple/30 transition-colors group">
+          <div className="flex items-center justify-between mb-4">
+            <div className="size-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Clock size={20} />
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Canais Ativos</p>
-            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{channels.length}</p>
-          </div>
+          <p className="text-xs font-black uppercase text-text-secondary tracking-widest">Tempo Médio Resposta</p>
+          <p className="text-3xl font-black text-white mt-1">{avgResponseTime}</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-5">
-          <div className="size-12 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center">
-            <Truck size={30} />
+
+        <div className="bg-bg-card p-6 rounded-2xl border border-border-main shadow-sm hover:border-brand-orange/30 transition-colors group">
+          <div className="flex items-center justify-between mb-4">
+            <div className="size-10 rounded-xl bg-brand-orange/10 text-brand-orange flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Share2 size={20} />
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Itens em Full/FBA</p>
-            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">482</p>
+          <p className="text-xs font-black uppercase text-text-secondary tracking-widest">Marketplaces Ativos</p>
+          <p className="text-3xl font-black text-white mt-1">{channels.filter(c => c.status === 'ativo').length}</p>
+        </div>
+
+        <div className="bg-bg-card p-6 rounded-2xl border border-border-main shadow-sm hover:border-brand-purple/30 transition-colors group">
+          <div className="flex items-center justify-between mb-4">
+            <div className="size-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Truck size={20} />
+            </div>
           </div>
+          <p className="text-xs font-black uppercase text-text-secondary tracking-widest">Estoque Full/FBA</p>
+          <p className="text-3xl font-black text-white mt-1">{channels.filter(c => c.estoque_cor === 'verde').length} Canais</p>
         </div>
       </div>
 
-      {/* Middle Section: Status and Consultant Feedback */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Status por Canal */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-            <h3 className="font-bold text-lg flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary dark:text-accent">signal_cellular_alt</span>
-              Status por Canal
-            </h3>
-            <span className="text-xs font-medium px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full">Sistema Estável</span>
-          </div>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Canal ML */}
-            <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="size-10 rounded-full bg-white border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
-                  <img src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.19.1/mercadolibre/logo__large_plus.png" alt="ML" className="size-7 object-contain" referrerPolicy="no-referrer" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm">Mercado Livre</h4>
-                  <div className="flex items-center gap-1">
-                    <span className="size-2 rounded-full bg-green-500 animate-pulse"></span>
-                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Sincronizado</span>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-500">Status Full</span>
-                  <span className="font-semibold text-green-600 dark:text-green-400">Ativo</span>
-                </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-green-500 h-full w-[94%]"></div>
-                </div>
-              </div>
-            </div>
-            {/* Canal Amazon */}
-            <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="size-10 rounded-full bg-white border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="AZ" className="size-7 object-contain" referrerPolicy="no-referrer" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm">Amazon</h4>
-                  <div className="flex items-center gap-1">
-                    <span className="size-2 rounded-full bg-green-500"></span>
-                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Sincronizado</span>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-500">Status FBA</span>
-                  <span className="font-semibold text-green-600 dark:text-green-400">Ativo</span>
-                </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-green-500 h-full w-[88%]"></div>
-                </div>
-              </div>
-            </div>
-            {/* Canal Shopee */}
-            <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="size-10 rounded-full bg-white border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="SH" className="size-7 object-contain" referrerPolicy="no-referrer" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm">Shopee</h4>
-                  <div className="flex items-center gap-1">
-                    <span className="size-2 rounded-full bg-yellow-500"></span>
-                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Aguardando</span>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-500">Envios Diretos</span>
-                  <span className="font-semibold text-primary dark:text-accent">12 Pendentes</span>
-                </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-primary dark:bg-accent h-full w-[45%]"></div>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Marketplaces Grid */}
+      <div className="bg-bg-card rounded-2xl border border-border-main shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-border-main bg-white/5 flex items-center justify-between">
+          <h2 className="text-lg font-black text-white uppercase tracking-tight italic">Status nos Marketplaces</h2>
+          <span className="text-[10px] font-black uppercase px-2 py-1 bg-emerald-500/10 text-emerald-500 rounded-full">Operação Saudável</span>
         </div>
+        <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {channels.map((channel) => (
+            <div key={channel.id} className="p-5 rounded-2xl border border-border-main bg-white/5 space-y-4 hover:border-brand-orange/20 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="size-12 rounded-xl bg-white border border-border-main p-2 flex items-center justify-center overflow-hidden">
+                    <img 
+                      src={MARKETPLACE_LOGOS[channel.nome] || "https://picsum.photos/seed/shop/100/100"} 
+                      alt={channel.nome} 
+                      className="w-full h-full object-contain"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-white">{channel.nome}</h4>
+                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Canal de Venda</p>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <div className="flex items-center gap-1.5">
+                    <div className={`size-2.5 rounded-full ${getTrafficLightColor(channel.status_cor)} shadow-lg shadow-current/20`} />
+                    <span className="text-[10px] font-black uppercase text-text-secondary">{channel.status}</span>
+                  </div>
+                </div>
+              </div>
 
-        {/* Parecer do Consultor */}
-        <div className="bg-primary text-white rounded-xl shadow-lg shadow-primary/20 p-6 flex flex-col justify-between relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-            <span className="material-symbols-outlined text-8xl">clinical_notes</span>
-          </div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="material-symbols-outlined text-accent">tips_and_updates</span>
-              <h3 className="font-bold text-lg">Parecer do Consultor</h3>
+              <div className="pt-4 border-t border-border-main grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[9px] font-black text-text-secondary uppercase tracking-widest mb-1">Logística / Full</p>
+                  <div className="flex items-center gap-1.5">
+                    <div className={`size-2 rounded-full ${getTrafficLightColor(channel.estoque_cor)}`} />
+                    <span className="text-xs font-bold text-white">{channel.estoque_tipo}</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-[9px] font-black text-text-secondary uppercase tracking-widest mb-1">Última Sinc.</p>
+                  <p className="text-xs font-bold text-white">{format(new Date(channel.data_atualizacao), "HH:mm")}</p>
+                </div>
+              </div>
             </div>
-            <p className="text-blue-100 text-sm leading-relaxed mb-6">
-              "{insight?.descricao || "Sua performance no Full cresceu 15% este mês. Recomendamos aumentar o estoque de itens curva A para a Black Friday. O canal Amazon apresenta oportunidade em eletrônicos."}"
-            </p>
-          </div>
-          <div className="relative z-10 flex items-center justify-between border-t border-white/20 pt-4">
-            <div className="flex items-center gap-2">
-              <div className="size-8 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-xs">RC</div>
-              <span className="text-xs font-medium">Rodrigo Costa</span>
-            </div>
-            <button className="text-xs font-bold bg-white text-primary px-3 py-1.5 rounded-lg hover:bg-accent transition-colors">Ver Estratégia</button>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* Minhas Solicitações Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-          <h3 className="font-bold text-lg">Minhas Solicitações (Protocolos)</h3>
-          <Link to="/support" className="text-sm font-semibold text-primary dark:text-accent flex items-center gap-1 hover:underline">
-            Ver tudo <span className="material-symbols-outlined text-sm">open_in_new</span>
-          </Link>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column: Insights & Evolution */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Consultant Insights */}
+          <div className="bg-bg-card text-white rounded-3xl p-8 relative overflow-hidden group shadow-2xl shadow-black/20 border border-border-main">
+            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+              <TrendingUp size={120} />
+            </div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="size-10 rounded-xl bg-gradient-to-br from-brand-orange to-brand-purple flex items-center justify-center shadow-lg shadow-brand-orange/20">
+                  <BarChart3 size={20} className="text-white" />
+                </div>
+                <h3 className="text-xl font-black italic uppercase tracking-tight">Insights do Consultor</h3>
+              </div>
+              <div className="space-y-4">
+                <p className="text-text-secondary text-lg leading-relaxed font-medium italic">
+                  "{insight?.descricao || "Sua performance no Full cresceu 15% este mês. Recomendamos aumentar o estoque de itens curva A para a Black Friday. O canal Amazon apresenta oportunidade em eletrônicos."}"
+                </p>
+                <div className="flex items-center gap-3 pt-6 border-t border-border-main">
+                  <div className="size-10 rounded-full bg-brand-orange/20 flex items-center justify-center text-brand-orange font-bold">RC</div>
+                  <div>
+                    <p className="text-sm font-bold">Rodrigo Costa</p>
+                    <p className="text-[10px] font-black uppercase text-text-secondary tracking-widest">Consultor Estratégico Sênior</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Evolution History */}
+          <div className="bg-bg-card rounded-2xl border border-border-main shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-border-main bg-white/5 flex items-center justify-between">
+              <h2 className="text-lg font-black text-white uppercase tracking-tight italic">Evolução do Cliente</h2>
+              <button 
+                onClick={() => setShowAllEvolution(!showAllEvolution)}
+                className="text-xs font-black text-brand-orange hover:underline uppercase tracking-widest flex items-center gap-1"
+              >
+                {showAllEvolution ? "Ver Menos" : "Ver Histórico Completo"}
+                {showAllEvolution ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-border-main before:via-border-main before:to-transparent">
+                {(showAllEvolution ? evolution : evolution.slice(0, 2)).map((item, i) => (
+                  <div key={item.id} className="relative flex items-start group">
+                    <div className={`absolute left-0 size-10 rounded-full border-4 border-bg-card flex items-center justify-center z-10 transition-colors ${i === 0 ? 'bg-brand-orange text-white' : 'bg-white/5 text-text-secondary'}`}>
+                      {i === 0 ? <CheckCircle2 size={16} /> : <Clock size={16} />}
+                    </div>
+                    <div className="ml-14 flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="font-black text-white uppercase tracking-tight">{item.titulo}</h4>
+                        <time className="text-[10px] font-black text-text-secondary uppercase tracking-widest">{format(new Date(item.data_criacao), "dd MMM, yyyy", { locale: ptBR })}</time>
+                      </div>
+                      <p className="text-sm text-text-secondary leading-relaxed">
+                        {item.descricao}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider">
-                <th className="px-6 py-4 font-bold">Protocolo</th>
-                <th className="px-6 py-4 font-bold">Assunto</th>
-                <th className="px-6 py-4 font-bold">Status</th>
-                <th className="px-6 py-4 font-bold">Data</th>
-                <th className="px-6 py-4 font-bold text-right">Ação</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {protocols.map((p) => (
-                <tr key={p.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                  <td className="px-6 py-4 font-medium text-primary dark:text-accent">#PRT-{p.id}</td>
-                  <td className="px-6 py-4 text-sm">{p.titulo}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      p.status === 'aberto' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                      p.status === 'concluido' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                    }`}>
-                      {p.status === 'aberto' ? 'Em Análise' : p.status === 'concluido' ? 'Resolvido' : 'Pendente'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
-                    {format(new Date(p.data_criacao), "dd MMM, yyyy", { locale: ptBR })}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <Link to={`/protocols/${p.id}`} className="p-1 hover:text-primary transition-colors inline-block">
-                      <span className="material-symbols-outlined">visibility</span>
-                    </Link>
-                  </td>
-                </tr>
+
+        {/* Right Column: Protocols */}
+        <div className="space-y-8">
+          <div className="bg-bg-card rounded-2xl border border-border-main shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-border-main bg-white/5 flex items-center justify-between">
+              <h2 className="text-lg font-black text-white uppercase tracking-tight italic">Protocolos Ativos</h2>
+              <Link to="/support" className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                <ExternalLink size={18} className="text-text-secondary" />
+              </Link>
+            </div>
+            <div className="divide-y divide-border-main">
+              {openProtocols.slice(0, 5).map((p) => (
+                <Link key={p.id} to={`/protocols/${p.id}`} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors group">
+                  <div className="flex items-center gap-3">
+                    <div className={`size-2 rounded-full ${p.status === 'aberto' ? 'bg-brand-orange' : 'bg-brand-purple'}`} />
+                    <div>
+                      <p className="text-sm font-bold text-white group-hover:text-brand-orange transition-colors truncate max-w-[150px]">{p.titulo}</p>
+                      <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest">#PRT-{p.id}</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-black uppercase px-2 py-1 rounded-lg bg-white/5 text-text-secondary">
+                    {p.status === 'aberto' ? 'Aberto' : 'Em Andamento'}
+                  </span>
+                </Link>
               ))}
-            </tbody>
-          </table>
+              {openProtocols.length === 0 && (
+                <div className="p-8 text-center">
+                  <p className="text-sm text-text-secondary font-medium italic">Nenhum protocolo ativo no momento.</p>
+                </div>
+              )}
+            </div>
+            <div className="p-4 bg-white/5 border-t border-border-main">
+              <Link to="/new-protocol" className="w-full py-3 bg-bg-card border border-border-main rounded-xl text-xs font-black uppercase tracking-widest text-text-secondary hover:text-white hover:border-brand-orange transition-all flex items-center justify-center gap-2">
+                Novo Protocolo
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Floating Action Button */}
       <Link 
         to="/new-protocol"
-        className="fixed bottom-8 right-8 bg-accent hover:bg-yellow-500 text-primary font-bold py-4 px-6 rounded-full shadow-2xl flex items-center gap-3 transition-all hover:scale-105 active:scale-95 group z-50"
+        className="fixed bottom-8 right-8 bg-gradient-to-r from-brand-orange to-brand-purple hover:from-brand-orange-light hover:to-brand-purple-light text-white font-black py-4 px-8 rounded-full shadow-2xl flex items-center gap-3 transition-all hover:scale-105 active:scale-95 group z-50"
       >
-        <span className="material-symbols-outlined font-bold transition-transform group-hover:rotate-90">add_box</span>
-        <span className="tracking-tight">Cadastrar Protocolo</span>
+        <Plus size={20} className="transition-transform group-hover:rotate-90" />
+        <span className="tracking-tight uppercase italic">Cadastrar Protocolo</span>
       </Link>
     </div>
+  );
+}
+
+function Plus({ size, className }: { size: number, className?: string }) {
+  return (
+    <svg 
+      width={size} 
+      height={size} 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="3" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className={className}
+    >
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
   );
 }
