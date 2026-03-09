@@ -88,9 +88,10 @@ export default function ClientProfile() {
       await refreshClient();
       setIsEditing(false);
       alert("Perfil atualizado com sucesso!");
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao salvar alterações.");
+    } catch (err: any) {
+      console.error("Erro ao salvar perfil:", err);
+      const errorMessage = err.response?.data?.error || err.message || "Erro desconhecido";
+      alert(`Erro ao salvar alterações: ${errorMessage}`);
     }
   };
 
@@ -126,13 +127,13 @@ export default function ClientProfile() {
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate("/admin/clients")}
-            className="p-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-primary transition-colors"
+            className="p-2 bg-bg-card rounded-xl border border-border-main text-text-secondary hover:text-brand-orange transition-colors"
           >
             <ChevronLeft size={20} />
           </button>
           <div>
-            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight italic uppercase">{client.nome}</h1>
-            <p className="text-slate-500 dark:text-slate-400 font-medium uppercase text-[10px] tracking-widest">Painel do Consultor • Gestão Estratégica</p>
+            <h1 className="text-3xl font-black text-text-primary tracking-tight italic uppercase">{client.nome}</h1>
+            <p className="text-text-secondary font-medium uppercase text-[10px] tracking-widest">Painel do Consultor • Gestão Estratégica</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -165,24 +166,24 @@ export default function ClientProfile() {
       {isEditing ? (
         <div className="space-y-8">
           {/* Basic Info Edit */}
-          <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
-            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic">Informações Básicas</h3>
+          <div className="bg-bg-card p-8 rounded-3xl border border-border-main shadow-sm space-y-6">
+            <h3 className="text-lg font-black text-text-primary uppercase italic">Informações Básicas</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Nome da Operação</label>
+                <label className="text-[10px] font-black uppercase text-text-secondary tracking-widest">Nome da Operação</label>
                 <input 
                   type="text" 
                   value={editData.nome || ""} 
                   onChange={(e) => setEditData({...editData, nome: e.target.value})}
-                  className="w-full p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary"
+                  className="w-full p-4 bg-bg-main border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-brand-orange text-text-primary"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Status Geral</label>
+                <label className="text-[10px] font-black uppercase text-text-secondary tracking-widest">Status Geral</label>
                 <select 
                   value={editData.status || ""} 
                   onChange={(e) => setEditData({...editData, status: e.target.value})}
-                  className="w-full p-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary"
+                  className="w-full p-4 bg-bg-main border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-brand-orange text-text-primary"
                 >
                   <option value="ativo">Ativo</option>
                   <option value="inativo">Inativo</option>
@@ -193,21 +194,21 @@ export default function ClientProfile() {
           </div>
 
           {/* Marketplaces Edit */}
-          <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
-            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic">Gestão de Marketplaces (Farol)</h3>
+          <div className="bg-bg-card p-8 rounded-3xl border border-border-main shadow-sm space-y-6">
+            <h3 className="text-lg font-black text-text-primary uppercase italic">Gestão de Marketplaces (Farol)</h3>
             <div className="grid grid-cols-1 gap-4">
               {channels.map((channel, idx) => (
-                <div key={idx} className="p-6 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                <div key={idx} className="p-6 rounded-2xl border border-border-main bg-white/5 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Marketplace</label>
-                    <p className="font-black text-slate-900 dark:text-white">{channel.nome}</p>
+                    <label className="text-[9px] font-black text-text-secondary uppercase tracking-widest">Marketplace</label>
+                    <p className="font-black text-text-primary">{channel.nome}</p>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Status</label>
+                    <label className="text-[9px] font-black text-text-secondary uppercase tracking-widest">Status</label>
                     <select 
                       value={channel.status} 
                       onChange={(e) => updateChannel(idx, 'status', e.target.value)}
-                      className="w-full p-3 bg-white dark:bg-slate-800 border-none rounded-xl text-xs font-bold"
+                      className="w-full p-3 bg-bg-main border-none rounded-xl text-xs font-bold text-text-primary"
                     >
                       <option value="ativo">Ativo</option>
                       <option value="inativo">Inativo</option>
@@ -215,11 +216,11 @@ export default function ClientProfile() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Farol Status</label>
+                    <label className="text-[9px] font-black text-text-secondary uppercase tracking-widest">Farol Status</label>
                     <select 
                       value={channel.status_cor} 
                       onChange={(e) => updateChannel(idx, 'status_cor', e.target.value)}
-                      className="w-full p-3 bg-white dark:bg-slate-800 border-none rounded-xl text-xs font-bold"
+                      className="w-full p-3 bg-bg-main border-none rounded-xl text-xs font-bold text-text-primary"
                     >
                       <option value="verde">Verde (Saudável)</option>
                       <option value="amarelo">Amarelo (Atenção)</option>
@@ -227,21 +228,21 @@ export default function ClientProfile() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Logística</label>
+                    <label className="text-[9px] font-black text-text-secondary uppercase tracking-widest">Logística</label>
                     <input 
                       type="text" 
                       value={channel.estoque_tipo} 
                       onChange={(e) => updateChannel(idx, 'estoque_tipo', e.target.value)}
-                      className="w-full p-3 bg-white dark:bg-slate-800 border-none rounded-xl text-xs font-bold"
+                      className="w-full p-3 bg-bg-main border-none rounded-xl text-xs font-bold text-text-primary"
                       placeholder="Ex: Full, FBA, Fulfillment"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Farol Logística</label>
+                    <label className="text-[9px] font-black text-text-secondary uppercase tracking-widest">Farol Logística</label>
                     <select 
                       value={channel.estoque_cor} 
                       onChange={(e) => updateChannel(idx, 'estoque_cor', e.target.value)}
-                      className="w-full p-3 bg-white dark:bg-slate-800 border-none rounded-xl text-xs font-bold"
+                      className="w-full p-3 bg-bg-main border-none rounded-xl text-xs font-bold text-text-primary"
                     >
                       <option value="verde">Verde (Abastecido)</option>
                       <option value="amarelo">Amarelo (Reposição)</option>
@@ -254,8 +255,8 @@ export default function ClientProfile() {
           </div>
 
           {/* Insight Edit */}
-          <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-xl space-y-6">
-            <h3 className="text-lg font-black text-white uppercase italic flex items-center gap-2">
+          <div className="bg-bg-card p-8 rounded-3xl border border-border-main shadow-xl space-y-6">
+            <h3 className="text-lg font-black text-text-primary uppercase italic flex items-center gap-2">
               <Lightbulb className="text-primary" size={20} />
               Insight Estratégico do Consultor
             </h3>
@@ -263,7 +264,7 @@ export default function ClientProfile() {
               rows={4}
               value={insight?.descricao || ""} 
               onChange={(e) => setInsight({...insight, descricao: e.target.value})}
-              className="w-full p-6 bg-slate-800 border-none rounded-2xl text-white font-medium italic focus:ring-2 focus:ring-primary"
+              className="w-full p-6 bg-bg-card border border-border-main rounded-2xl text-text-primary font-medium italic focus:ring-2 focus:ring-primary"
               placeholder="Escreva sua análise detalhada e manual para o cliente..."
             />
           </div>
@@ -278,21 +279,21 @@ export default function ClientProfile() {
             </div>
 
             {/* Marketplace Status View */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-              <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
-                <h2 className="text-lg font-black text-slate-900 dark:text-white uppercase italic">Status nos Marketplaces</h2>
+            <div className="bg-bg-card rounded-3xl border border-border-main shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-border-main bg-white/5">
+                <h2 className="text-lg font-black text-text-primary uppercase italic">Status nos Marketplaces</h2>
               </div>
               <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                 {channels.map((m) => (
-                  <div key={m.id} className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center gap-4">
-                    <div className="size-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-[10px] text-slate-500 overflow-hidden">
+                  <div key={m.id} className="p-4 rounded-2xl border border-border-main flex items-center gap-4">
+                    <div className="size-10 rounded-xl bg-white border border-border-main flex items-center justify-center font-black text-[10px] text-text-secondary overflow-hidden">
                       <img src={MARKETPLACE_LOGOS[m.nome]} className="w-full h-full object-contain p-1" referrerPolicy="no-referrer" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-black text-slate-900 dark:text-white">{m.nome}</p>
+                      <p className="text-sm font-black text-text-primary">{m.nome}</p>
                       <div className="flex items-center gap-1.5">
                         <div className={`size-2 rounded-full ${m.status_cor === 'verde' ? 'bg-green-500' : m.status_cor === 'amarelo' ? 'bg-yellow-500' : 'bg-red-500'}`} />
-                        <span className="text-[10px] font-black uppercase text-slate-500">{m.status}</span>
+                        <span className="text-[10px] font-black uppercase text-text-secondary">{m.status}</span>
                       </div>
                     </div>
                   </div>
@@ -301,38 +302,38 @@ export default function ClientProfile() {
             </div>
 
             {/* Evolution History View */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-              <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex items-center justify-between">
-                <h2 className="text-lg font-black text-slate-900 dark:text-white uppercase italic flex items-center gap-2">
+            <div className="bg-bg-card rounded-3xl border border-border-main shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-border-main bg-white/5 flex items-center justify-between">
+                <h2 className="text-lg font-black text-text-primary uppercase italic flex items-center gap-2">
                   <Activity size={20} className="text-primary" />
                   Histórico de Evolução
                 </h2>
                 <button 
                   onClick={() => setIsAddingEvolution(true)}
-                  className="px-4 py-2 bg-primary/10 text-primary rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary hover:text-white transition-all flex items-center gap-2"
+                  className="px-4 py-2 bg-primary/10 text-primary rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary dark:hover:text-white transition-all flex items-center gap-2"
                 >
                   <Plus size={14} /> Adicionar Atualização
                 </button>
               </div>
               
               {isAddingEvolution && (
-                <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 space-y-4">
+                <div className="p-6 bg-white/5 border-b border-border-main space-y-4">
                   <input 
                     type="text" 
                     placeholder="Título da Atualização (Ex: Otimização de Ads)"
                     value={newEvolution.titulo}
                     onChange={(e) => setNewEvolution({...newEvolution, titulo: e.target.value})}
-                    className="w-full p-3 bg-white dark:bg-slate-900 border-none rounded-xl text-sm font-bold"
+                    className="w-full p-3 bg-bg-card border border-border-main rounded-xl text-sm font-bold text-text-primary"
                   />
                   <textarea 
                     placeholder="Descreva a evolução detalhada..."
                     value={newEvolution.descricao}
                     onChange={(e) => setNewEvolution({...newEvolution, descricao: e.target.value})}
-                    className="w-full p-3 bg-white dark:bg-slate-900 border-none rounded-xl text-sm font-medium"
+                    className="w-full p-3 bg-bg-card border border-border-main rounded-xl text-sm font-medium text-text-primary"
                     rows={3}
                   />
                   <div className="flex justify-end gap-2">
-                    <button onClick={() => setIsAddingEvolution(false)} className="px-4 py-2 text-xs font-bold text-slate-500">Cancelar</button>
+                    <button onClick={() => setIsAddingEvolution(false)} className="px-4 py-2 text-xs font-bold text-text-secondary">Cancelar</button>
                     <button onClick={handleAddEvolution} className="px-4 py-2 bg-primary text-white rounded-xl text-xs font-black uppercase">Salvar Evolução</button>
                   </div>
                 </div>
@@ -341,16 +342,34 @@ export default function ClientProfile() {
               <div className="p-6 space-y-6">
                 {evolution.map((item) => (
                   <div key={item.id} className="flex gap-4 group">
-                    <div className="size-10 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 shrink-0">
+                    <div className="size-10 rounded-2xl bg-white/5 flex items-center justify-center text-text-secondary shrink-0">
                       <History size={20} />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-black text-slate-900 dark:text-white uppercase tracking-tight">{item.titulo}</h4>
-                        <span className="text-[10px] font-black text-slate-400 uppercase">{format(new Date(item.data_criacao), "dd/MM/yyyy")}</span>
+                        <h4 className="font-black text-text-primary uppercase tracking-tight">{item.titulo}</h4>
+                        <span className="text-[10px] font-black text-text-secondary uppercase">{format(new Date(item.data_criacao), "dd/MM/yyyy")}</span>
                       </div>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{item.descricao}</p>
+                      <p className="text-sm text-text-secondary leading-relaxed">{item.descricao}</p>
                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Recent Protocols */}
+            <div className="bg-bg-card rounded-3xl border border-border-main shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-border-main bg-white/5">
+                <h2 className="text-lg font-black text-text-primary uppercase italic">Protocolos Recentes</h2>
+              </div>
+              <div className="divide-y divide-border-main">
+                {(client as any).protocolos_recentes?.map((p: any) => (
+                  <div key={p.id} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
+                    <div>
+                      <p className="text-sm font-bold text-text-primary">{p.titulo}</p>
+                      <p className="text-[10px] font-black text-text-secondary uppercase">#PRT-{p.id}</p>
+                    </div>
+                    <StatusBadge status={p.status} />
                   </div>
                 ))}
               </div>
@@ -359,32 +378,14 @@ export default function ClientProfile() {
 
           <div className="space-y-8">
             {/* Consultant Insight View */}
-            <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-xl">
+            <div className="bg-bg-card text-text-primary rounded-3xl p-8 shadow-xl border border-border-main">
               <h3 className="text-lg font-black uppercase italic mb-4 flex items-center gap-2">
                 <Lightbulb className="text-primary" size={20} />
                 Insight Atual
               </h3>
-              <p className="text-slate-300 text-sm leading-relaxed italic font-medium">
+              <p className="text-text-secondary text-sm leading-relaxed italic font-medium">
                 "{insight?.descricao || "Nenhum insight registrado."}"
               </p>
-            </div>
-
-            {/* Recent Protocols */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-              <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
-                <h2 className="text-lg font-black text-slate-900 dark:text-white uppercase italic">Protocolos Recentes</h2>
-              </div>
-              <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                {(client as any).protocolos_recentes?.map((p: any) => (
-                  <div key={p.id} className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <div>
-                      <p className="text-sm font-bold text-slate-900 dark:text-white">{p.titulo}</p>
-                      <p className="text-[10px] font-black text-slate-400 uppercase">#PRT-{p.id}</p>
-                    </div>
-                    <StatusBadge status={p.status} />
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>

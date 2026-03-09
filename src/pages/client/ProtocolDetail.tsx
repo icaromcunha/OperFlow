@@ -65,9 +65,9 @@ export default function ProtocolDetail() {
 
   if (!protocol) return (
     <div className="p-8 text-center">
-      <AlertCircle className="text-6xl text-slate-300 mx-auto mb-4" />
-      <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Protocolo não encontrado</h2>
-      <button onClick={() => navigate(-1)} className="mt-4 text-primary font-bold hover:underline">Voltar</button>
+      <AlertCircle className="text-6xl text-text-secondary mx-auto mb-4" />
+      <h2 className="text-2xl font-bold text-text-primary">Protocolo não encontrado</h2>
+      <button onClick={() => navigate(-1)} className="mt-4 text-brand-orange font-bold hover:underline">Voltar</button>
     </div>
   );
 
@@ -98,7 +98,7 @@ export default function ProtocolDetail() {
           <span className="text-xs font-mono text-text-secondary bg-white/5 px-3 py-1 rounded-lg self-start border border-border-main">
             #OP-{format(new Date(protocol.data_criacao), "yyMM")}-{String(protocol.id).padStart(3, '0')}
           </span>
-          <h1 className="text-3xl font-black tracking-tight text-white">{protocol.titulo}</h1>
+          <h1 className="text-3xl font-black tracking-tight text-text-primary">{protocol.titulo}</h1>
         </div>
         
         <div className="flex flex-wrap gap-4 mb-8">
@@ -185,7 +185,7 @@ export default function ProtocolDetail() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Digite sua resposta, dúvida ou anexo de evidência..."
-                className="w-full p-5 bg-white/5 border border-border-main rounded-xl text-sm focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all resize-none text-white min-h-[100px] placeholder:text-text-secondary/50"
+                className="w-full p-5 bg-bg-card border border-border-main rounded-xl text-sm focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all resize-none text-text-primary min-h-[100px] placeholder:text-text-secondary/50"
                 rows={3}
               />
             </div>

@@ -22,11 +22,11 @@
 
 @layer base {
   :root {
-    --bg-main: #F3F4F6;
+    --bg-main: #F9FAFB;
     --bg-card: #FFFFFF;
     --border-main: #E5E7EB;
     --text-primary: #111827;
-    --text-secondary: #6B7280;
+    --text-secondary: #4B5563;
   }
 
   .dark {
@@ -47,15 +47,15 @@
 }
 
 .btn-secondary {
-  @apply bg-transparent border border-[#2A2A35] hover:bg-white/5 text-white font-bold py-3 px-6 rounded-xl transition-all active:scale-[0.98];
+  @apply bg-transparent border border-border-main hover:bg-black/5 dark:hover:bg-white/5 text-text-primary font-bold py-3 px-6 rounded-xl transition-all active:scale-[0.98];
 }
 
 .card-main {
-  @apply bg-[#1A1A22] border border-[#2A2A35] rounded-[12px] shadow-sm;
+  @apply bg-bg-card border border-border-main rounded-[12px] shadow-sm;
 }
 
 .input-main {
-  @apply bg-[#1A1A22] border border-[#2A2A35] rounded-xl p-4 text-white focus:ring-2 focus:ring-[#7B3FE4] focus:border-transparent outline-none transition-all;
+  @apply bg-bg-card border border-border-main rounded-xl p-4 text-text-primary focus:ring-2 focus:ring-[#7B3FE4] focus:border-transparent outline-none transition-all;
 }
 
 .material-symbols-outlined {

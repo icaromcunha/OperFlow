@@ -245,7 +245,8 @@ export function initDb() {
   seedData();
 
   // Ensure Admin User exists (for demo purposes)
-  const hashedAdminPwd = bcrypt.hashSync(process.env.ADMIN_PASSWORD || "Acesso@007", 10);
+  const defaultPassword = "Acesso@007";
+  const hashedAdminPwd = bcrypt.hashSync(defaultPassword, 10);
   
   // Update ALL existing users to the new password as requested
   db.prepare("UPDATE usuarios SET senha = ?").run(hashedAdminPwd);

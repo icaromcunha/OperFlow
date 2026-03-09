@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn, Eye, EyeOff, ShieldCheck, Sun, Moon, ArrowRight } from "lucide-react";
 import api from "../../services/api";
 import { useTheme } from "../../components/ThemeProvider";
+import { Logo } from "../../components/ui/Logo";
 
 export default function AdminLogin({ onLogin }: { onLogin: (user: any) => void }) {
   const [email, setEmail] = useState(() => localStorage.getItem("remembered_email_admin") || "");
@@ -53,9 +54,7 @@ export default function AdminLogin({ onLogin }: { onLogin: (user: any) => void }
         
         <div className="relative z-10 max-w-lg">
           <div className="flex items-center gap-3 mb-8">
-            <div className="size-12 bg-gradient-to-br from-brand-orange to-brand-purple rounded-2xl flex items-center justify-center shadow-xl shadow-brand-orange/20">
-              <ShieldCheck className="text-white size-7" />
-            </div>
+            <Logo className="size-12" />
             <h1 className="text-4xl font-black text-white tracking-tighter italic uppercase">OperFlow</h1>
           </div>
           
@@ -92,14 +91,12 @@ export default function AdminLogin({ onLogin }: { onLogin: (user: any) => void }
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 bg-bg-main">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-12 justify-center">
-            <div className="size-10 bg-gradient-to-br from-brand-orange to-brand-purple rounded-xl flex items-center justify-center">
-              <ShieldCheck className="text-white size-6" />
-            </div>
-            <h1 className="text-2xl font-black text-white tracking-tighter italic uppercase">OperFlow</h1>
+            <Logo className="size-10" />
+            <h1 className="text-2xl font-black text-text-primary tracking-tighter italic uppercase">OperFlow</h1>
           </div>
 
           <div className="mb-10">
-            <h3 className="text-3xl font-black text-white mb-2">Acesso Administrativo</h3>
+            <h3 className="text-3xl font-black text-text-primary mb-2">Acesso Administrativo</h3>
             <p className="text-text-secondary font-medium">Entre com suas credenciais de consultor ou admin.</p>
           </div>
 
@@ -122,7 +119,7 @@ export default function AdminLogin({ onLogin }: { onLogin: (user: any) => void }
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-white/5 border border-border-main rounded-2xl text-white focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all font-semibold placeholder:text-text-secondary/30"
+                  className="w-full pl-12 pr-4 py-4 bg-bg-card border border-border-main rounded-2xl text-text-primary focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all font-semibold placeholder:text-text-secondary/30"
                   placeholder="seu@email.com"
                   required
                 />
@@ -143,7 +140,7 @@ export default function AdminLogin({ onLogin }: { onLogin: (user: any) => void }
                   type={showPassword ? "text" : "password"}
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
-                  className="w-full pl-12 pr-12 py-4 bg-white/5 border border-border-main rounded-2xl text-white focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all font-semibold placeholder:text-text-secondary/30"
+                  className="w-full pl-12 pr-12 py-4 bg-bg-card border border-border-main rounded-2xl text-text-primary focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all font-semibold placeholder:text-text-secondary/30"
                   placeholder="••••••••"
                   required
                 />

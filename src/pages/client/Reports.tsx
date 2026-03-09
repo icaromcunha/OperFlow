@@ -51,7 +51,7 @@ export default function Reports() {
   return (
     <div className="p-6 space-y-8 max-w-7xl mx-auto bg-bg-main min-h-screen text-text-primary">
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-black text-white tracking-tight">Relatórios Estratégicos</h1>
+        <h1 className="text-3xl font-black text-text-primary tracking-tight">Relatórios Estratégicos</h1>
         <p className="text-text-secondary font-medium">Análise de performance e direcionamentos do seu consultor.</p>
       </div>
 
@@ -67,7 +67,7 @@ export default function Reports() {
             </span>
           </div>
           <p className="text-sm font-medium text-text-secondary">Faturamento Total</p>
-          <h3 className="text-2xl font-black text-white mt-1">R$ 328.450,00</h3>
+          <h3 className="text-2xl font-black text-text-primary mt-1">R$ 328.450,00</h3>
         </div>
 
         <div className="bg-bg-card p-6 rounded-2xl border border-border-main shadow-sm">
@@ -80,7 +80,7 @@ export default function Reports() {
             </span>
           </div>
           <p className="text-sm font-medium text-text-secondary">Total de Pedidos</p>
-          <h3 className="text-2xl font-black text-white mt-1">950</h3>
+          <h3 className="text-2xl font-black text-text-primary mt-1">950</h3>
         </div>
 
         <div className="bg-bg-card p-6 rounded-2xl border border-border-main shadow-sm">
@@ -93,7 +93,7 @@ export default function Reports() {
             </span>
           </div>
           <p className="text-sm font-medium text-text-secondary">Conversão Média</p>
-          <h3 className="text-2xl font-black text-white mt-1">3.2%</h3>
+          <h3 className="text-2xl font-black text-text-primary mt-1">3.2%</h3>
         </div>
 
         <div className="bg-bg-card p-6 rounded-2xl border border-border-main shadow-sm">
@@ -106,14 +106,14 @@ export default function Reports() {
             </span>
           </div>
           <p className="text-sm font-medium text-text-secondary">Ticket Médio</p>
-          <h3 className="text-2xl font-black text-white mt-1">R$ 345,70</h3>
+          <h3 className="text-2xl font-black text-text-primary mt-1">R$ 345,70</h3>
         </div>
       </div>
 
       {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-bg-card p-6 rounded-2xl border border-border-main shadow-sm">
-          <h3 className="text-lg font-bold text-white mb-6">Evolução de Vendas</h3>
+          <h3 className="text-lg font-bold text-text-primary mb-6">Evolução de Vendas</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={dataVendas}>
@@ -137,7 +137,7 @@ export default function Reports() {
         </div>
 
         <div className="bg-bg-card p-6 rounded-2xl border border-border-main shadow-sm">
-          <h3 className="text-lg font-bold text-white mb-6">Vendas por Canal</h3>
+          <h3 className="text-lg font-bold text-text-primary mb-6">Vendas por Canal</h3>
           <div className="h-[300px] relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -160,7 +160,7 @@ export default function Reports() {
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
                 <p className="text-xs font-bold text-text-secondary uppercase tracking-widest">Total</p>
-                <p className="text-xl font-black text-white">100%</p>
+                <p className="text-xl font-black text-text-primary">100%</p>
               </div>
             </div>
           </div>
@@ -171,7 +171,7 @@ export default function Reports() {
                   <div className="size-3 rounded-full" style={{ backgroundColor: canal.color }} />
                   <span className="text-text-secondary">{canal.name}</span>
                 </div>
-                <span className="font-bold text-white">{canal.value}%</span>
+                <span className="font-bold text-text-primary">{canal.value}%</span>
               </div>
             ))}
           </div>
@@ -187,7 +187,7 @@ export default function Reports() {
               <div className="p-2 bg-brand-purple/10 rounded-lg text-brand-purple">
                 <History size={20} />
               </div>
-              <h3 className="font-bold text-white">Histórico do Consultor</h3>
+              <h3 className="font-bold text-text-primary">Histórico do Consultor</h3>
             </div>
           </div>
           <div className="p-6 space-y-6">
@@ -237,7 +237,7 @@ export default function Reports() {
               <div className="p-2 bg-amber-500/10 rounded-lg text-amber-500">
                 <Lightbulb size={20} />
               </div>
-              <h3 className="font-bold text-white">Dicas de Melhorias</h3>
+              <h3 className="font-bold text-text-primary">Dicas de Melhorias</h3>
             </div>
           </div>
           <div className="p-6 space-y-4">
@@ -253,7 +253,7 @@ export default function Reports() {
                       <TrendingUp className="text-amber-500" size={20} />
                     </div>
                     <div>
-                      <h4 className="font-bold text-white mb-1">{insight.titulo}</h4>
+                      <h4 className="font-bold text-text-primary mb-1">{insight.titulo}</h4>
                       <p className="text-sm text-text-secondary leading-relaxed">
                         {insight.descricao}
                       </p>

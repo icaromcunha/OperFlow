@@ -65,7 +65,7 @@ export default function CreateProtocol() {
       </button>
 
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-black text-white tracking-tight">Novo Protocolo</h1>
+        <h1 className="text-3xl font-black text-text-primary tracking-tight">Novo Protocolo</h1>
         <p className="text-text-secondary font-medium italic">Descreva sua necessidade para que nosso time de consultores possa atuar.</p>
       </div>
 
@@ -81,7 +81,7 @@ export default function CreateProtocol() {
             value={formData.titulo}
             onChange={(e) => setFormData({ ...formData, titulo: e.target.value })}
             placeholder="Ex: Atualização de estoque curva A - Mercado Livre"
-            className="w-full p-4 bg-white/5 border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all text-white placeholder:text-text-secondary/50"
+            className="w-full p-4 bg-white/5 border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all text-text-primary placeholder:text-text-secondary/50"
           />
         </div>
 
@@ -96,10 +96,10 @@ export default function CreateProtocol() {
                 required
                 value={formData.categoria_id}
                 onChange={(e) => setFormData({ ...formData, categoria_id: e.target.value })}
-                className="w-full p-4 bg-white/5 border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all appearance-none text-white"
+                className="w-full p-4 bg-white/5 border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all appearance-none text-text-primary"
               >
                 {config?.categorias.map((c: any) => (
-                  <option key={c.id} value={c.id} className="bg-bg-card">{c.nome}</option>
+                  <option key={c.id} value={c.id} className="bg-bg-card text-text-primary">{c.nome}</option>
                 ))}
               </select>
               <ChevronDown size={20} className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none" />
@@ -115,10 +115,10 @@ export default function CreateProtocol() {
                 required
                 value={formData.prioridade_id}
                 onChange={(e) => setFormData({ ...formData, prioridade_id: e.target.value })}
-                className="w-full p-4 bg-white/5 border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all appearance-none text-white"
+                className="w-full p-4 bg-white/5 border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all appearance-none text-text-primary"
               >
                 {config?.prioridades.map((p: any) => (
-                  <option key={p.id} value={p.id} className="bg-bg-card">{p.nome}</option>
+                  <option key={p.id} value={p.id} className="bg-bg-card text-text-primary">{p.nome}</option>
                 ))}
               </select>
               <ChevronDown size={20} className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none" />
@@ -137,7 +137,7 @@ export default function CreateProtocol() {
             onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
             placeholder="Descreva detalhadamente o que precisa ser feito ou o problema identificado..."
             rows={6}
-            className="w-full p-5 bg-white/5 border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all resize-none text-white placeholder:text-text-secondary/50"
+            className="w-full p-5 bg-white/5 border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all resize-none text-text-primary placeholder:text-text-secondary/50"
           />
         </div>
 

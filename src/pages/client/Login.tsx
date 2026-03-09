@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn, Eye, EyeOff, ShoppingCart, Sun, Moon } from "lucide-react";
 import api from "../../services/api";
 import { useTheme } from "../../components/ThemeProvider";
+import { Logo } from "../../components/ui/Logo";
 
 export default function ClientLogin({ onLogin }: { onLogin: (user: any) => void }) {
   const [email, setEmail] = useState(() => localStorage.getItem("remembered_email_client") || "");
@@ -46,10 +47,8 @@ export default function ClientLogin({ onLogin }: { onLogin: (user: any) => void 
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 md:px-10 border-b border-border-main bg-bg-card">
         <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center size-10 bg-gradient-to-br from-brand-orange to-brand-purple rounded-lg text-white">
-            <ShoppingCart className="size-6 font-bold" />
-          </div>
-          <h2 className="text-white text-xl font-bold tracking-tight uppercase italic">
+          <Logo className="size-10" />
+          <h2 className="text-text-primary text-xl font-bold tracking-tight uppercase italic">
             OperFlow
           </h2>
         </div>
@@ -71,13 +70,13 @@ export default function ClientLogin({ onLogin }: { onLogin: (user: any) => void 
           <div className="h-32 bg-bg-main relative overflow-hidden">
             <div className="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=800&auto=format&fit=crop')] bg-cover bg-center" />
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-transparent to-bg-card/80">
-              <ShoppingCart className="text-brand-orange size-12 opacity-80" />
+              <Logo className="size-16" />
             </div>
           </div>
 
           <div className="p-8">
             <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold text-white">OperFlow</h1>
+              <h1 className="text-2xl font-bold text-text-primary">OperFlow</h1>
               <p className="text-text-secondary mt-2">Acesse sua conta para gerenciar suas operações</p>
             </div>
 
@@ -99,7 +98,7 @@ export default function ClientLogin({ onLogin }: { onLogin: (user: any) => void 
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-white/5 border border-border-main rounded-lg text-white focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all placeholder:text-text-secondary/50"
+                    className="w-full pl-10 pr-4 py-3 bg-bg-card border border-border-main rounded-lg text-text-primary focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all placeholder:text-text-secondary/50"
                     placeholder="cliente@test.com"
                     required
                   />
@@ -120,7 +119,7 @@ export default function ClientLogin({ onLogin }: { onLogin: (user: any) => void 
                     type={showPassword ? "text" : "password"}
                     value={senha}
                     onChange={(e) => setSenha(e.target.value)}
-                    className="w-full pl-10 pr-12 py-3 bg-white/5 border border-border-main rounded-lg text-white focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all placeholder:text-text-secondary/50"
+                    className="w-full pl-10 pr-12 py-3 bg-bg-card border border-border-main rounded-lg text-text-primary focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all placeholder:text-text-secondary/50"
                     placeholder="Sua senha secreta"
                     required
                   />

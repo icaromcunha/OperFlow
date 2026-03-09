@@ -39,7 +39,7 @@ export default function ProtocolList() {
   return (
     <div className="p-8 space-y-8 bg-bg-main min-h-screen text-text-primary">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-black text-white tracking-tight">Fila de Pareceres</h1>
+        <h1 className="text-3xl font-black text-text-primary tracking-tight">Fila de Pareceres</h1>
         <p className="text-text-secondary font-medium">Gerenciamento estratégico de solicitações operacionais</p>
       </div>
 
@@ -52,7 +52,7 @@ export default function ProtocolList() {
               placeholder="Filtrar por ID, título ou lojista..."
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-border-main rounded-lg text-sm focus:ring-2 focus:ring-brand-orange/50 text-white placeholder:text-text-secondary/50"
+              className="w-full pl-10 pr-4 py-2.5 bg-bg-card border border-border-main rounded-lg text-sm focus:ring-2 focus:ring-brand-orange/50 text-text-primary placeholder:text-text-secondary/50"
             />
           </div>
           <div className="flex gap-2">
@@ -87,12 +87,12 @@ export default function ProtocolList() {
                       <div className="size-8 rounded bg-brand-orange/10 flex items-center justify-center text-brand-orange font-bold text-xs">
                         {p.cliente_nome?.substring(0, 2).toUpperCase()}
                       </div>
-                      <span className="text-sm font-semibold text-white">{p.cliente_nome}</span>
+                      <span className="text-sm font-semibold text-text-primary">{p.cliente_nome}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-white truncate max-w-xs group-hover:text-brand-orange transition-colors">{p.titulo}</span>
+                      <span className="text-sm font-bold text-text-primary truncate max-w-xs group-hover:text-brand-orange transition-colors">{p.titulo}</span>
                       <span className="text-xs text-text-secondary">{p.categoria_nome || "Geral"}</span>
                     </div>
                   </td>
@@ -141,7 +141,7 @@ export default function ProtocolList() {
             <button className="p-1 rounded hover:bg-white/10 disabled:opacity-50" disabled>
               <ChevronLeft size={18} />
             </button>
-            <span className="font-bold text-white">1</span>
+            <span className="font-bold text-text-primary">1</span>
             <button className="p-1 rounded hover:bg-white/10">
               <ChevronRight size={18} />
             </button>

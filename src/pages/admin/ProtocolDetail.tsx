@@ -90,9 +90,9 @@ export default function ProtocolDetail() {
 
   if (!protocol) return (
     <div className="p-8 text-center">
-      <AlertCircle className="text-6xl text-slate-300 mx-auto mb-4" />
-      <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Protocolo não encontrado</h2>
-      <button onClick={() => navigate(-1)} className="mt-4 text-primary font-bold hover:underline">Voltar</button>
+      <AlertCircle className="text-6xl text-text-secondary mx-auto mb-4" />
+      <h2 className="text-2xl font-bold text-text-primary">Protocolo não encontrado</h2>
+      <button onClick={() => navigate(-1)} className="mt-4 text-brand-orange font-bold hover:underline">Voltar</button>
     </div>
   );
 
@@ -127,7 +127,7 @@ export default function ProtocolDetail() {
               <div className="p-2 bg-brand-orange/10 text-brand-orange rounded-lg">
                 <AlertCircle size={20} />
               </div>
-              <h1 className="text-2xl font-black tracking-tight text-white">{protocol.titulo}</h1>
+              <h1 className="text-2xl font-black tracking-tight text-text-primary">{protocol.titulo}</h1>
             </div>
             <p className="text-text-secondary leading-relaxed bg-white/5 p-4 rounded-xl border border-border-main italic">
               "{protocol.descricao}"
@@ -137,7 +137,7 @@ export default function ProtocolDetail() {
           {/* Interactions / Activity History */}
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-black uppercase tracking-wider flex items-center gap-2 text-white">
+              <h3 className="text-lg font-black uppercase tracking-wider flex items-center gap-2 text-text-primary">
                 <History className="text-brand-orange" size={20} />
                 Histórico de Atividades
               </h3>
@@ -182,7 +182,7 @@ export default function ProtocolDetail() {
                         </span>
                       </div>
                       <p className={`text-sm leading-relaxed whitespace-pre-wrap ${
-                        isWhatsApp || isStatusChange ? 'text-text-secondary italic' : 'text-white'
+                        isWhatsApp || isStatusChange ? 'text-text-secondary italic' : 'text-text-primary'
                       }`}>
                         {i.mensagem}
                       </p>
@@ -201,7 +201,7 @@ export default function ProtocolDetail() {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Escreva seu parecer ou orientação estratégica..."
-                  className="w-full p-5 bg-white/5 border border-border-main rounded-xl text-sm focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all resize-none text-white min-h-[120px] placeholder:text-text-secondary/50"
+                  className="w-full p-5 bg-bg-card border border-border-main rounded-xl text-sm focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all resize-none text-text-primary min-h-[120px] placeholder:text-text-secondary/50"
                 />
                 <div className="absolute bottom-4 right-4 flex items-center gap-2">
                   <span className="text-[10px] font-bold text-text-secondary uppercase">Pressione Ctrl+Enter para enviar</span>
@@ -254,7 +254,7 @@ export default function ProtocolDetail() {
                 <select 
                   value={protocol.status}
                   onChange={(e) => updateStatus(e.target.value)}
-                  className="w-full p-3 bg-white/5 border border-border-main rounded-xl text-sm font-bold text-white appearance-none focus:ring-2 focus:ring-brand-orange"
+                  className="w-full p-3 bg-bg-card border border-border-main rounded-xl text-sm font-bold text-text-primary appearance-none focus:ring-2 focus:ring-brand-orange"
                 >
                   <option value="aberto">Aguardando Análise</option>
                   <option value="em atendimento">Em Revisão Estratégica</option>
@@ -275,7 +275,7 @@ export default function ProtocolDetail() {
                   protocol.prioridade_name === 'Alta' ? 'bg-red-500 animate-pulse' :
                   protocol.prioridade_name === 'Média' ? 'bg-amber-500' : 'bg-brand-orange'
                 }`}></span>
-                <span className="font-black uppercase tracking-wider text-xs text-white">{protocol.prioridade_name}</span>
+                <span className="font-black uppercase tracking-wider text-xs text-text-primary">{protocol.prioridade_name}</span>
               </div>
             </div>
 
@@ -289,11 +289,11 @@ export default function ProtocolDetail() {
                   {protocol.cliente_nome.charAt(0)}
                 </div>
                 <div className="flex flex-col">
-                  <p className="text-sm font-black tracking-tight text-white">{protocol.cliente_nome}</p>
+                  <p className="text-sm font-black tracking-tight text-text-primary">{protocol.cliente_nome}</p>
                   <p className="text-xs text-text-secondary font-medium">{protocol.cliente_email}</p>
                 </div>
               </div>
-              <button className="w-full py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2 border border-border-main">
+              <button className="w-full py-2.5 bg-bg-card hover:bg-white/5 text-text-primary rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2 border border-border-main">
                 <History size={16} />
                 Ver Histórico do Lojista
               </button>

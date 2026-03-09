@@ -31,6 +31,7 @@ import {
   Users
 } from "lucide-react";
 import { useTheme } from "../ThemeProvider";
+import { Logo } from "../ui/Logo";
 
 export default function AdminLayout({ user, onLogout }: { user: any; onLogout: () => void }) {
   const { config, toggleDarkMode } = useTheme();
@@ -61,7 +62,7 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
       <motion.aside 
         initial={false}
         animate={{ width: isCollapsed ? 80 : 256 }}
-        className="bg-bg-main border-r border-border-main text-white flex flex-col fixed h-full z-50 transition-colors duration-200 overflow-hidden"
+        className="bg-bg-main border-r border-border-main text-text-primary flex flex-col fixed h-full z-50 transition-colors duration-200 overflow-hidden"
       >
         <div className="p-6 flex items-center justify-between">
           <AnimatePresence mode="wait">
@@ -72,17 +73,13 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                 exit={{ opacity: 0, x: -20 }}
                 className="flex items-center gap-3 overflow-hidden whitespace-nowrap"
               >
-                <div className="size-10 bg-gradient-to-br from-brand-orange to-brand-purple rounded-xl flex items-center justify-center shadow-lg shadow-brand-orange/20 shrink-0">
-                  <Rocket className="text-white size-6" />
-                </div>
-                <span className="font-bold text-xl tracking-tight uppercase italic text-white">OperFlow</span>
+                <Logo className="size-10 shrink-0" />
+                <span className="font-bold text-xl tracking-tight uppercase italic text-text-primary">OperFlow</span>
               </motion.div>
             )}
           </AnimatePresence>
           {isCollapsed && (
-            <div className="size-10 bg-gradient-to-br from-brand-orange to-brand-purple rounded-xl flex items-center justify-center shadow-lg shadow-brand-orange/20 mx-auto">
-              <Rocket className="text-white size-6" />
-            </div>
+            <Logo className="size-10 mx-auto" />
           )}
         </div>
 
@@ -105,7 +102,7 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-white truncate">{user.nome}</p>
+                    <p className="text-xs font-bold text-text-primary truncate">{user.nome}</p>
                     <p className="text-[9px] text-text-secondary uppercase tracking-wider">{user.perfil === 'admin' ? 'Administrador' : 'Consultor Estratégico'}</p>
                   </div>
                 </div>
@@ -126,7 +123,7 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${
                   isActive 
                     ? "bg-brand-purple text-white font-bold shadow-lg shadow-brand-purple/20" 
-                    : "text-text-secondary hover:bg-white/5 hover:text-white"
+                    : "text-text-secondary hover:bg-black/5 dark:hover:bg-white/5 hover:text-text-primary"
                 }`}
               >
                 <item.icon size={20} className={isActive ? "text-white shrink-0" : "text-text-secondary group-hover:text-white shrink-0"} />
@@ -181,7 +178,7 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
               <input
                 type="text"
                 placeholder="Pesquisar operações, lojistas ou SKUs..."
-                className="w-full bg-bg-card border border-border-main rounded-xl pl-12 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-purple transition-all text-white placeholder:text-text-secondary"
+                className="w-full bg-bg-card border border-border-main rounded-xl pl-12 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-purple transition-all text-text-primary placeholder:text-text-secondary"
               />
             </div>
           </div>
@@ -218,7 +215,7 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                 className="absolute right-0 mt-2 w-80 bg-bg-card rounded-2xl shadow-2xl border border-border-main z-50 overflow-hidden"
               >
                 <div className="p-4 border-b border-border-main flex justify-between items-center bg-white/5">
-                  <h4 className="font-bold text-white">Notificações Admin</h4>
+                  <h4 className="font-bold text-text-primary">Notificações Admin</h4>
                   <span className="text-[10px] font-black uppercase text-white bg-brand-purple px-2 py-0.5 rounded-full">3 Novas</span>
                 </div>
                 <div className="max-h-96 overflow-y-auto">
@@ -235,7 +232,7 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                            <Info size={16} />}
                         </div>
                         <div className="flex-1">
-                          <p className="text-xs font-bold text-white group-hover:text-brand-orange transition-colors">{n.title}</p>
+                          <p className="text-xs font-bold text-text-primary group-hover:text-brand-orange transition-colors">{n.title}</p>
                           <p className="text-[11px] text-text-secondary mt-0.5 leading-relaxed">{n.message}</p>
                           <p className="text-[9px] text-text-secondary/50 mt-2 font-medium uppercase tracking-wider">{n.time}</p>
                         </div>

@@ -88,7 +88,7 @@ export default function ClientDashboard() {
             </div>
           </div>
           <p className="text-xs font-black uppercase text-text-secondary tracking-widest">Protocolos Abertos</p>
-          <p className="text-3xl font-black text-white mt-1">{openProtocols.length}</p>
+          <p className="text-3xl font-black text-text-primary mt-1">{openProtocols.length}</p>
         </div>
 
         <div className="bg-bg-card p-6 rounded-2xl border border-border-main shadow-sm hover:border-brand-purple/30 transition-colors group">
@@ -98,7 +98,7 @@ export default function ClientDashboard() {
             </div>
           </div>
           <p className="text-xs font-black uppercase text-text-secondary tracking-widest">Tempo Médio Resposta</p>
-          <p className="text-3xl font-black text-white mt-1">{avgResponseTime}</p>
+          <p className="text-3xl font-black text-text-primary mt-1">{avgResponseTime}</p>
         </div>
 
         <div className="bg-bg-card p-6 rounded-2xl border border-border-main shadow-sm hover:border-brand-orange/30 transition-colors group">
@@ -108,7 +108,7 @@ export default function ClientDashboard() {
             </div>
           </div>
           <p className="text-xs font-black uppercase text-text-secondary tracking-widest">Marketplaces Ativos</p>
-          <p className="text-3xl font-black text-white mt-1">{channels.filter(c => c.status === 'ativo').length}</p>
+          <p className="text-3xl font-black text-text-primary mt-1">{channels.filter(c => c.status === 'ativo').length}</p>
         </div>
 
         <div className="bg-bg-card p-6 rounded-2xl border border-border-main shadow-sm hover:border-brand-purple/30 transition-colors group">
@@ -118,14 +118,14 @@ export default function ClientDashboard() {
             </div>
           </div>
           <p className="text-xs font-black uppercase text-text-secondary tracking-widest">Estoque Full/FBA</p>
-          <p className="text-3xl font-black text-white mt-1">{channels.filter(c => c.estoque_cor === 'verde').length} Canais</p>
+          <p className="text-3xl font-black text-text-primary mt-1">{channels.filter(c => c.estoque_cor === 'verde').length} Canais</p>
         </div>
       </div>
 
       {/* Marketplaces Grid */}
       <div className="bg-bg-card rounded-2xl border border-border-main shadow-sm overflow-hidden">
         <div className="p-6 border-b border-border-main bg-white/5 flex items-center justify-between">
-          <h2 className="text-lg font-black text-white uppercase tracking-tight italic">Status nos Marketplaces</h2>
+          <h2 className="text-lg font-black text-text-primary uppercase tracking-tight italic">Status nos Marketplaces</h2>
           <span className="text-[10px] font-black uppercase px-2 py-1 bg-emerald-500/10 text-emerald-500 rounded-full">Operação Saudável</span>
         </div>
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -142,7 +142,7 @@ export default function ClientDashboard() {
                     />
                   </div>
                   <div>
-                    <h4 className="font-black text-white">{channel.nome}</h4>
+                    <h4 className="font-black text-text-primary">{channel.nome}</h4>
                     <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Canal de Venda</p>
                   </div>
                 </div>
@@ -159,12 +159,12 @@ export default function ClientDashboard() {
                   <p className="text-[9px] font-black text-text-secondary uppercase tracking-widest mb-1">Logística / Full</p>
                   <div className="flex items-center gap-1.5">
                     <div className={`size-2 rounded-full ${getTrafficLightColor(channel.estoque_cor)}`} />
-                    <span className="text-xs font-bold text-white">{channel.estoque_tipo}</span>
+                    <span className="text-xs font-bold text-text-primary">{channel.estoque_tipo}</span>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-[9px] font-black text-text-secondary uppercase tracking-widest mb-1">Última Sinc.</p>
-                  <p className="text-xs font-bold text-white">{format(new Date(channel.data_atualizacao), "HH:mm")}</p>
+                  <p className="text-xs font-bold text-text-primary">{format(new Date(channel.data_atualizacao), "HH:mm")}</p>
                 </div>
               </div>
             </div>
@@ -176,7 +176,7 @@ export default function ClientDashboard() {
         {/* Left Column: Insights & Evolution */}
         <div className="lg:col-span-2 space-y-8">
           {/* Consultant Insights */}
-          <div className="bg-bg-card text-white rounded-3xl p-8 relative overflow-hidden group shadow-2xl shadow-black/20 border border-border-main">
+          <div className="bg-bg-card text-text-primary rounded-3xl p-8 relative overflow-hidden group shadow-2xl shadow-black/20 border border-border-main">
             <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
               <TrendingUp size={120} />
             </div>
@@ -205,7 +205,7 @@ export default function ClientDashboard() {
           {/* Evolution History */}
           <div className="bg-bg-card rounded-2xl border border-border-main shadow-sm overflow-hidden">
             <div className="p-6 border-b border-border-main bg-white/5 flex items-center justify-between">
-              <h2 className="text-lg font-black text-white uppercase tracking-tight italic">Evolução do Cliente</h2>
+              <h2 className="text-lg font-black text-text-primary uppercase tracking-tight italic">Evolução do Cliente</h2>
               <button 
                 onClick={() => setShowAllEvolution(!showAllEvolution)}
                 className="text-xs font-black text-brand-orange hover:underline uppercase tracking-widest flex items-center gap-1"
@@ -223,7 +223,7 @@ export default function ClientDashboard() {
                     </div>
                     <div className="ml-14 flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-black text-white uppercase tracking-tight">{item.titulo}</h4>
+                        <h4 className="font-black text-text-primary uppercase tracking-tight">{item.titulo}</h4>
                         <time className="text-[10px] font-black text-text-secondary uppercase tracking-widest">{format(new Date(item.data_criacao), "dd MMM, yyyy", { locale: ptBR })}</time>
                       </div>
                       <p className="text-sm text-text-secondary leading-relaxed">
@@ -235,13 +235,11 @@ export default function ClientDashboard() {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Right Column: Protocols */}
-        <div className="space-y-8">
+          {/* Protocols */}
           <div className="bg-bg-card rounded-2xl border border-border-main shadow-sm overflow-hidden">
             <div className="p-6 border-b border-border-main bg-white/5 flex items-center justify-between">
-              <h2 className="text-lg font-black text-white uppercase tracking-tight italic">Protocolos Ativos</h2>
+              <h2 className="text-lg font-black text-text-primary uppercase tracking-tight italic">Protocolos Ativos</h2>
               <Link to="/support" className="p-2 hover:bg-white/5 rounded-lg transition-colors">
                 <ExternalLink size={18} className="text-text-secondary" />
               </Link>
@@ -252,7 +250,7 @@ export default function ClientDashboard() {
                   <div className="flex items-center gap-3">
                     <div className={`size-2 rounded-full ${p.status === 'aberto' ? 'bg-brand-orange' : 'bg-brand-purple'}`} />
                     <div>
-                      <p className="text-sm font-bold text-white group-hover:text-brand-orange transition-colors truncate max-w-[150px]">{p.titulo}</p>
+                      <p className="text-sm font-bold text-text-primary group-hover:text-brand-orange transition-colors truncate max-w-[150px]">{p.titulo}</p>
                       <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest">#PRT-{p.id}</p>
                     </div>
                   </div>
@@ -273,6 +271,10 @@ export default function ClientDashboard() {
               </Link>
             </div>
           </div>
+        </div>
+
+        {/* Right Column: Empty or for future widgets */}
+        <div className="space-y-8">
         </div>
       </div>
 

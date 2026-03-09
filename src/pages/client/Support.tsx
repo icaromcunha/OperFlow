@@ -52,7 +52,7 @@ export default function Support() {
     <div className="p-6 space-y-8 max-w-7xl mx-auto bg-bg-main min-h-screen text-text-primary">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-black text-white tracking-tight">Central de Suporte</h1>
+          <h1 className="text-3xl font-black text-text-primary tracking-tight">Central de Suporte</h1>
           <p className="text-text-secondary font-medium">Acompanhe suas solicitações e abra novos protocolos.</p>
         </div>
         <Link 
@@ -73,7 +73,7 @@ export default function Support() {
             placeholder="Buscar por título ou número do protocolo..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-bg-card border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all text-white placeholder:text-text-secondary/50"
+            className="w-full pl-12 pr-4 py-3 bg-bg-card border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all text-text-primary placeholder:text-text-secondary/50"
           />
         </div>
         <button className="flex items-center gap-2 px-6 py-3 bg-bg-card border border-border-main rounded-xl font-bold text-text-secondary hover:bg-white/5 transition-colors">
@@ -104,7 +104,7 @@ export default function Support() {
                     <div>
                       <div className="flex items-center gap-3 mb-1">
                         <span className="text-xs font-bold text-text-secondary uppercase tracking-widest">#{protocol.id}</span>
-                        <h3 className="font-bold text-white group-hover:text-brand-orange transition-colors">{protocol.titulo}</h3>
+                        <h3 className="font-bold text-text-primary group-hover:text-brand-orange transition-colors">{protocol.titulo}</h3>
                       </div>
                       <div className="flex flex-wrap items-center gap-4 text-sm text-text-secondary">
                         <span className="flex items-center gap-1.5">
@@ -134,7 +134,7 @@ export default function Support() {
             <div className="size-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-border-main">
               <MessageSquare className="text-text-secondary" size={40} />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Nenhum protocolo encontrado</h3>
+            <h3 className="text-xl font-bold text-text-primary mb-2">Nenhum protocolo encontrado</h3>
             <p className="text-text-secondary max-w-md mx-auto mb-8">
               Você ainda não abriu nenhuma solicitação ou sua busca não retornou resultados.
             </p>

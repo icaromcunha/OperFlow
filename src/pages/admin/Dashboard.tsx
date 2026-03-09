@@ -45,7 +45,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8 bg-bg-main min-h-full text-text-primary">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-black text-white tracking-tight">Painel do Consultor</h1>
+        <h1 className="text-3xl font-black text-text-primary tracking-tight">Painel do Consultor</h1>
         <p className="text-text-secondary font-medium italic">Monitoramento de operações de marketplace e gestão estratégica</p>
       </div>
 
@@ -95,7 +95,7 @@ export default function AdminDashboard() {
         <div className="lg:col-span-2 space-y-8">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2 italic uppercase tracking-tight">
+              <h2 className="text-xl font-bold text-text-primary flex items-center gap-2 italic uppercase tracking-tight">
                 <Zap className="text-brand-orange size-5" />
                 Fila de Protocolos Prioritários
               </h2>
@@ -129,7 +129,7 @@ export default function AdminDashboard() {
                       >
                         <td className="px-6 py-4 text-xs font-mono text-text-secondary group-hover:text-brand-orange transition-colors">#PRT-{p.id}</td>
                         <td className="px-6 py-4">
-                          <span className="text-sm font-bold text-white">{p.cliente_nome}</span>
+                          <span className="text-sm font-bold text-text-primary">{p.cliente_nome}</span>
                         </td>
                         <td className="px-6 py-4">
                           <p className="text-sm text-text-secondary truncate max-w-[150px]">{p.titulo || "Análise de Conta"}</p>
@@ -163,7 +163,7 @@ export default function AdminDashboard() {
           {/* Integrated Reports Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-bg-card p-6 rounded-3xl border border-border-main shadow-sm">
-              <h3 className="text-sm font-black text-white uppercase italic mb-6 flex items-center gap-2">
+              <h3 className="text-sm font-black text-text-primary uppercase italic mb-6 flex items-center gap-2">
                 <Activity size={18} className="text-brand-orange" />
                 Performance da Equipe (SLA)
               </h3>
@@ -186,7 +186,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="bg-bg-card p-6 rounded-3xl border border-border-main shadow-sm">
-              <h3 className="text-sm font-black text-white uppercase italic mb-6 flex items-center gap-2">
+              <h3 className="text-sm font-black text-text-primary uppercase italic mb-6 flex items-center gap-2">
                 <LayoutList size={18} className="text-brand-purple" />
                 Volume por Categoria
               </h3>
@@ -200,7 +200,7 @@ export default function AdminDashboard() {
                   <div key={i} className="flex items-center gap-3">
                     <div className={`size-3 rounded-full ${cat.color}`} />
                     <span className="text-xs font-bold text-text-secondary flex-1">{cat.label}</span>
-                    <span className="text-xs font-black text-white">{cat.value}%</span>
+                    <span className="text-xs font-black text-text-primary">{cat.value}%</span>
                   </div>
                 ))}
               </div>
@@ -210,7 +210,7 @@ export default function AdminDashboard() {
 
         {/* Clients Alerts Panel */}
         <div className="space-y-4">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+          <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
             <AlertCircle className="text-red-500 size-5" />
             Painel de Alertas de Clientes
           </h2>
@@ -222,7 +222,7 @@ export default function AdminDashboard() {
                 className="bg-bg-card p-4 rounded-2xl border border-border-main shadow-sm hover:border-red-500/50 transition-colors group cursor-pointer"
               >
                 <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-bold text-white group-hover:text-brand-orange transition-colors">{alert.client}</h4>
+                  <h4 className="font-bold text-text-primary group-hover:text-brand-orange transition-colors">{alert.client}</h4>
                   <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
                     alert.severity === 'crítico' ? 'bg-red-500/10 text-red-500' : 'bg-brand-orange/10 text-brand-orange'
                   }`}>
@@ -241,7 +241,7 @@ export default function AdminDashboard() {
 
           {/* Team Activity */}
           <div className="pt-6 space-y-4">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-xl font-bold text-text-primary flex items-center gap-2">
               <Activity className="text-brand-orange size-5" />
               Atividade da Equipe
             </h2>
@@ -262,12 +262,12 @@ export default function AdminDashboard() {
                       }`}></span>
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white group-hover:text-brand-orange transition-colors">{member.name}</p>
+                      <p className="text-sm font-bold text-text-primary group-hover:text-brand-orange transition-colors">{member.name}</p>
                       <p className="text-[10px] text-text-secondary uppercase font-medium">{member.handled} protocolos tratados</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-bold text-white">{member.avgTime}</p>
+                    <p className="text-xs font-bold text-text-primary">{member.avgTime}</p>
                     <p className="text-[9px] text-text-secondary uppercase">Tempo Médio</p>
                   </div>
                 </div>
