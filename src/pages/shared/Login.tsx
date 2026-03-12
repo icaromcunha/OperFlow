@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn, Eye, EyeOff, Sun, Moon, ArrowRight, ShieldCheck } from "lucide-react";
 import api from "../../services/api";
@@ -19,10 +20,44 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    const payload = { email, senha };
+    const configuredBase = (api.defaults.baseURL || "/api").toString().replace(/\/$/, "");
+    const candidateUrls = [
+      `${configuredBase}/auth/login`,
+      "/api/auth/login",
+      "/auth/login",
+    ].filter((value, index, array) => array.indexOf(value) === index);
+
+    let lastError: any;
+
     try {
-      const response = await api.post("/auth/login", { email, senha });
+      let response: any = null;
+
+      for (const url of candidateUrls) {
+        try {
+          response = await axios.post(url, payload);
+          break;
+        } catch (candidateError: any) {
+          const status = candidateError?.response?.status;
+          lastError = candidateError;
+
+          if (status === 404) {
+            continue;
+          }
+
+          throw candidateError;
+        }
+      }
+
+      if (!response) {
+        const attemptedRoutes = candidateUrls.join(", ");
+        setError(`Não foi possível encontrar a API de login. Rotas testadas: ${attemptedRoutes}. Verifique o deploy do backend e o proxy.`);
+        return;
+      }
+
       const { token, user } = response.data;
-      
+
       if (rememberMe) {
         localStorage.setItem("remembered_email", email);
       } else {
@@ -31,33 +66,26 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
 
       localStorage.setItem("token", token);
       onLogin(user);
-      
-      if (user.type === 'admin') {
+
+      if (user.type === "admin") {
         navigate("/admin");
       } else {
         navigate("/");
       }
     } catch (err: any) {
-      console.error("Login Error:", err);
-      const status = err.response?.status;
-      const apiBase = (api.defaults.baseURL || "/api").toString();
-
-      if (status === 404) {
-        setError(`Não foi possível encontrar a API de login (${apiBase}/auth/login). Verifique se o backend está publicado e se VITE_API_BASE_URL está configurada corretamente.`);
-      } else {
-        const errorMessage = err.response?.data?.error || err.message || "Erro ao fazer login. Verifique suas credenciais.";
-        setError(errorMessage);
-      }
+      console.error("Login Error:", err || lastError);
+      const errorMessage = err.response?.data?.error || err.message || "Erro ao fazer login. Verifique suas credenciais.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-bg-main flex items-center justify-center p-6 md:p-12 transition-colors duration-200 overflow-hidden text-text-primary">
+    <div className="relative min-h-screen bg-bg-main flex items-center justify-center p-6 md:p-12 transition-colors duration-200 overflow-hidden text-text-primary">
       {/* Decorative Elements */}
-      <div className="absolute -bottom-24 -left-24 size-96 bg-brand-orange/10 rounded-full blur-3xl" />
-      <div className="absolute -top-24 -right-24 size-96 bg-brand-purple/10 rounded-full blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -left-24 size-96 bg-brand-orange/10 rounded-full blur-3xl" />
+      <div className="pointer-events-none absolute -top-24 -right-24 size-96 bg-brand-purple/10 rounded-full blur-3xl" />
 
       <div className="w-full max-w-md relative z-10">
         <div className="flex flex-col items-center mb-8">
