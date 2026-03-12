@@ -15,7 +15,8 @@ import {
   Key,
   Phone,
   Link as LinkIcon,
-  Send
+  Send,
+  Database
 } from "lucide-react";
 import api from "../../services/api";
 
@@ -24,6 +25,9 @@ export default function AdminSettings() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [validating, setValidating] = useState(false);
+  const [supabaseStatus, setSupabaseStatus] = useState<{ enabled: boolean; message: string } | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [config, setConfig] = useState({
     nome_sistema: "OperFlow Consulting",
@@ -52,6 +56,10 @@ export default function AdminSettings() {
             whatsapp_webhook_url: response.data.whatsapp_webhook_url || ""
           });
         }
+
+        // Validate Supabase connection
+        const sbResponse = await api.get("/config/validate-supabase");
+        setSupabaseStatus(sbResponse.data);
       } catch (err) {
         console.error("Erro ao carregar configurações:", err);
       } finally {
@@ -87,12 +95,40 @@ export default function AdminSettings() {
     }
   };
 
+  const handleSyncSupabase = async () => {
+    if (!confirm("Isso irá sincronizar todos os dados locais (usuários, clientes, protocolos, etc.) para o Supabase. Deseja continuar?")) return;
+    
+    setSyncing(true);
+    try {
+      const response = await api.post("/config/sync-supabase");
+      alert(response.data.message || "Sincronização concluída com sucesso!");
+    } catch (err: any) {
+      alert(err.response?.data?.error || "Erro ao sincronizar com Supabase.");
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleValidateSupabase = async () => {
+    setValidating(true);
+    try {
+      const response = await api.get("/config/validate-supabase");
+      setSupabaseStatus(response.data);
+      alert(response.data.message);
+    } catch (err) {
+      alert("Erro ao validar conexão.");
+    } finally {
+      setValidating(false);
+    }
+  };
+
   const tabs = [
     { id: "geral", label: "Geral", icon: Settings },
     { id: "seguranca", label: "Segurança", icon: Shield },
     { id: "aparencia", label: "Aparência", icon: Palette },
     { id: "notificacoes", label: "Notificações", icon: Bell },
     { id: "integracoes", label: "Integrações", icon: LinkIcon },
+    { id: "supabase", label: "Supabase", icon: Database },
   ];
 
   if (loading) return (
@@ -351,6 +387,68 @@ export default function AdminSettings() {
                       {testing ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                       {testing ? "Testando..." : "Testar envio de mensagem"}
                     </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            {activeTab === "supabase" && (
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                    <Database size={20} className="text-blue-500" />
+                    Integração com Supabase
+                  </h3>
+                  
+                  <div className="p-6 bg-blue-50 dark:bg-blue-900/10 rounded-2xl border border-blue-100 dark:border-blue-900/30 mb-8">
+                    <p className="text-sm text-blue-700 dark:text-blue-300 font-medium leading-relaxed">
+                      O Supabase fornece uma infraestrutura de banco de dados escalável e em tempo real. 
+                      Certifique-se de que as variáveis de ambiente <code className="bg-blue-100 dark:bg-blue-900/50 px-1.5 py-0.5 rounded">SUPABASE_URL</code> e <code className="bg-blue-100 dark:bg-blue-900/50 px-1.5 py-0.5 rounded">SUPABASE_ANON_KEY</code> estão configuradas.
+                    </p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between p-6 border border-slate-100 dark:border-slate-800 rounded-2xl">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-slate-50 dark:bg-slate-800 text-primary rounded-xl">
+                          <Database size={24} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-900 dark:text-white">Sincronizar Dados Locais</p>
+                          <p className="text-xs text-slate-500">Pressione para migrar os dados do SQLite para o seu banco Supabase</p>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={handleSyncSupabase}
+                        disabled={syncing}
+                        className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                          syncing 
+                            ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                            : "bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20"
+                        } disabled:opacity-50`}
+                      >
+                        {syncing ? <Loader2 size={14} className="animate-spin" /> : <Database size={14} />}
+                        {syncing ? "Sincronizando..." : "Sincronizar Agora"}
+                      </button>
+                    </div>
+
+                    <div className="p-6 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-4">
+                      <div className="flex justify-between items-center">
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">Status da Conexão</p>
+                        <button 
+                          onClick={handleValidateSupabase}
+                          disabled={validating}
+                          className="text-xs font-bold text-primary hover:underline disabled:opacity-50"
+                        >
+                          {validating ? "Validando..." : "Testar Novamente"}
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className={`size-2 rounded-full ${supabaseStatus?.enabled ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+                        <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                          {supabaseStatus?.message || "Verificando status..."}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

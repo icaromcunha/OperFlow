@@ -1,6 +1,7 @@
 import express from "express";
 import db from "../db";
 import { authenticate } from "../middleware/auth";
+import { supabase, isSupabaseEnabled } from "../supabase";
 
 const router = express.Router();
 
@@ -24,7 +25,7 @@ router.get("/", authenticate, (req: any, res) => {
   res.json(clients);
 });
 
-router.post("/", authenticate, (req: any, res) => {
+router.post("/", authenticate, async (req: any, res) => {
   const { empresa_id, perfil } = req.user;
   
   if (perfil !== 'admin' && perfil !== 'consultor') {
@@ -39,7 +40,27 @@ router.post("/", authenticate, (req: any, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run(empresa_id, nome, email, status || 'ativo', whatsapp_numero || null, consultor_id || null, new Date().toISOString());
     
-    res.status(201).json({ id: result.lastInsertRowid });
+    const clientId = result.lastInsertRowid;
+
+    // Sync to Supabase if enabled
+    if (isSupabaseEnabled) {
+      try {
+        await supabase.from('clientes').insert({
+          id: clientId,
+          empresa_id,
+          nome,
+          email,
+          status: status || 'ativo',
+          whatsapp_numero: whatsapp_numero || null,
+          consultor_id: consultor_id || null
+        });
+        console.log(`Client ${clientId} synced to Supabase`);
+      } catch (e) {
+        console.error("Supabase sync error:", e);
+      }
+    }
+
+    res.status(201).json({ id: clientId });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

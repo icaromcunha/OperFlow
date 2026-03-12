@@ -1,8 +1,13 @@
 import React, { useState } from "react";
+import { useTheme } from "../ThemeProvider";
 
 export function Logo({ className = "size-10", variant = "system" }: { className?: string; variant?: "login" | "system" }) {
   const [imgError, setImgError] = useState(false);
-  const logoSrc = variant === "login" ? "/logoh.png" : "/logo.png";
+  
+  // Hardcoded Google Drive links as requested
+  const logoSrc = variant === "login" 
+    ? "https://drive.google.com/uc?id=1WT51iEfFcC6-7s1eVgA5NOWd0BnbsMWt" // Horizontal logo for login
+    : "https://drive.google.com/uc?id=1XdTLyPyRLzrwpbfmlGmw2zs1pgihocFC"; // Standard logo
 
   if (!imgError) {
     return (

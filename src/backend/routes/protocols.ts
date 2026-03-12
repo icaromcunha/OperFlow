@@ -2,6 +2,7 @@ import express from "express";
 import db from "../db";
 import { sendWhatsAppNotification } from "../services/whatsapp";
 import { authenticate } from "../middleware/auth";
+import { supabase, isSupabaseEnabled } from "../supabase";
 
 const router = express.Router();
 
@@ -108,7 +109,7 @@ router.get("/:id", authenticate, (req: any, res) => {
   res.json({ ...protocol, interactions });
 });
 
-router.post("/", authenticate, (req: any, res) => {
+router.post("/", authenticate, async (req: any, res) => {
   const { titulo, descricao, categoria_id, prioridade_id } = req.body;
   const { id: cliente_id, empresa_id } = req.user;
 
@@ -117,7 +118,28 @@ router.post("/", authenticate, (req: any, res) => {
     VALUES (?, ?, ?, ?, ?, ?)
   `).run(empresa_id, cliente_id, titulo, descricao, categoria_id, prioridade_id);
 
-  res.json({ id: result.lastInsertRowid });
+  const protocolId = result.lastInsertRowid;
+
+  // Sync to Supabase if enabled
+  if (isSupabaseEnabled) {
+    try {
+      await supabase.from('protocolos').insert({
+        id: protocolId,
+        empresa_id,
+        cliente_id,
+        titulo,
+        descricao,
+        categoria_id,
+        prioridade_id,
+        status: 'aberto'
+      });
+      console.log(`Protocol ${protocolId} synced to Supabase`);
+    } catch (e) {
+      console.error("Supabase sync error:", e);
+    }
+  }
+
+  res.json({ id: protocolId });
 });
 
 router.post("/:id/interactions", authenticate, async (req: any, res) => {
