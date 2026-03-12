@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
+import bcrypt from "bcryptjs";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn, Eye, EyeOff, Sun, Moon, ArrowRight, ShieldCheck } from "lucide-react";
 import api from "../../services/api";
+import { supabase, isSupabaseEnabled } from "../../services/supabase";
 import { useTheme } from "../../components/ThemeProvider";
 import { Logo } from "../../components/ui/Logo";
 
@@ -15,6 +17,53 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { toggleDarkMode } = useTheme();
+
+  const trySupabaseDirectLogin = async (email: string, senha: string) => {
+    if (!isSupabaseEnabled || !supabase) {
+      return null;
+    }
+
+    const { data: sbUser } = await supabase
+      .from("usuarios")
+      .select("id, empresa_id, nome, email, perfil, senha")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (sbUser && bcrypt.compareSync(senha, sbUser.senha)) {
+      return {
+        token: `sb-direct-admin-${sbUser.id}-${Date.now()}`,
+        user: {
+          id: sbUser.id,
+          nome: sbUser.nome,
+          email: sbUser.email,
+          type: "admin",
+          perfil: sbUser.perfil,
+          empresa_id: sbUser.empresa_id,
+        },
+      };
+    }
+
+    const { data: sbClient } = await supabase
+      .from("clientes")
+      .select("id, empresa_id, nome, email, senha")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (sbClient && bcrypt.compareSync(senha, sbClient.senha)) {
+      return {
+        token: `sb-direct-client-${sbClient.id}-${Date.now()}`,
+        user: {
+          id: sbClient.id,
+          nome: sbClient.nome,
+          email: sbClient.email,
+          type: "client",
+          empresa_id: sbClient.empresa_id,
+        },
+      };
+    }
+
+    return null;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,9 +105,15 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
       }
 
       if (!response) {
-        const attemptedRoutes = candidateUrls.join(", ");
-        setError(`Não foi possível encontrar a API de login. Rotas testadas: ${attemptedRoutes}. Verifique o deploy do backend e o proxy.`);
-        return;
+        const supabaseFallback = await trySupabaseDirectLogin(email, senha);
+
+        if (supabaseFallback) {
+          response = { data: supabaseFallback };
+        } else {
+          const attemptedRoutes = candidateUrls.join(", ");
+          setError(`Não foi possível autenticar via API nem Supabase direto. Rotas testadas: ${attemptedRoutes}. Verifique deploy do backend, proxy e políticas do Supabase.`);
+          return;
+        }
       }
 
       const { token, user } = response.data;
