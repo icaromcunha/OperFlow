@@ -39,8 +39,15 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
       }
     } catch (err: any) {
       console.error("Login Error:", err);
-      const errorMessage = err.response?.data?.error || err.message || "Erro ao fazer login. Verifique suas credenciais.";
-      setError(errorMessage);
+      const status = err.response?.status;
+      const apiBase = (api.defaults.baseURL || "/api").toString();
+
+      if (status === 404) {
+        setError(`Não foi possível encontrar a API de login (${apiBase}/auth/login). Verifique se o backend está publicado e se VITE_API_BASE_URL está configurada corretamente.`);
+      } else {
+        const errorMessage = err.response?.data?.error || err.message || "Erro ao fazer login. Verifique suas credenciais.";
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
