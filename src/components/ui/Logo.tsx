@@ -4,15 +4,19 @@ import { useTheme } from "../ThemeProvider";
 export function Logo({ className = "size-10", variant = "system" }: { className?: string; variant?: "login" | "system" }) {
   const [imgError, setImgError] = useState(false);
   
-  // Hardcoded Google Drive links as requested
+  // Hardcoded Google Drive links
+  // Standard direct link format
   const logoSrc = variant === "login" 
     ? "https://drive.google.com/uc?id=1WT51iEfFcC6-7s1eVgA5NOWd0BnbsMWt" // Horizontal logo for login
     : "https://drive.google.com/uc?id=1XdTLyPyRLzrwpbfmlGmw2zs1pgihocFC"; // Standard logo
 
+  const containerClasses = `${className} flex items-center justify-center overflow-hidden ${variant === 'login' ? 'min-h-[100px]' : 'min-h-[40px]'}`;
+
   if (!imgError) {
     return (
-      <div className={`${className} flex items-center justify-center overflow-hidden`}>
+      <div className={containerClasses}>
         <img 
+          key={logoSrc}
           src={logoSrc} 
           alt="Logo" 
           className="w-full h-full object-contain"
@@ -23,36 +27,19 @@ export function Logo({ className = "size-10", variant = "system" }: { className?
     );
   }
 
+  // Fallback UI - Simple and clean
   return (
-    <div className={`${className} flex items-center justify-center`}>
-      <svg viewBox="0 0 100 100" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FF7A18" />
-            <stop offset="100%" stopColor="#7B3FE4" />
-          </linearGradient>
-          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="2" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-          </filter>
-        </defs>
-        
-        {/* Main interlocking loops */}
-        <g fill="none" stroke="url(#logoGradient)" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" filter="url(#glow)">
-          {/* Outer loop - infinity style */}
-          <path d="M30 50 C30 35 45 25 50 25 C55 25 70 35 70 50 C70 65 55 75 50 75 C45 75 30 65 30 50 Z" />
-          
-          {/* Interlocking inner loop */}
-          <path d="M50 25 C65 25 80 40 80 50 C80 60 65 75 50 75 C35 75 20 60 20 50 C20 40 35 25 50 25" opacity="0.8" />
-          
-          {/* Arrows indicating flow and growth */}
-          <path d="M50 25 L60 15 M50 25 L40 15" strokeWidth="6" />
-          <path d="M50 75 L60 85 M50 75 L40 85" strokeWidth="6" />
-          
-          {/* Central connecting node */}
-          <circle cx="50" cy="50" r="4" fill="url(#logoGradient)" stroke="none" />
-        </g>
-      </svg>
+    <div className={containerClasses}>
+      <div className="flex flex-col items-center justify-center">
+        <div className="bg-brand-orange text-white font-black text-2xl px-4 py-2 rounded-xl italic shadow-lg">
+          OPERFLOW
+        </div>
+        {variant === 'login' && (
+          <div className="mt-2 text-[10px] font-bold text-text-secondary uppercase tracking-[0.3em]">
+            Gestão Inteligente
+          </div>
+        )}
+      </div>
     </div>
   );
 }

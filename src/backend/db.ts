@@ -279,47 +279,44 @@ export function initDb() {
   const hashedAdminPwd = bcrypt.hashSync(defaultPassword, 10);
   
   // Update ALL existing users to the new password as requested
-  db.prepare("UPDATE usuarios SET senha = ?").run(hashedAdminPwd);
-  db.prepare("UPDATE clientes SET senha = ?").run(hashedAdminPwd);
-
-  const adminUser = db.prepare("SELECT id FROM usuarios WHERE email = ?").get("admin@test.com") as any;
-  if (!adminUser) {
-    const company = db.prepare("SELECT id FROM empresas LIMIT 1").get() as any;
-    if (company) {
-      db.prepare("INSERT INTO usuarios (empresa_id, nome, email, senha, perfil) VALUES (?, ?, ?, ?, ?)").run(
-        company.id,
-        "Admin Teste",
-        "admin@test.com",
-        hashedAdminPwd,
-        "admin"
-      );
-    }
-  } else {
-    // Force update password to be sure
-    db.prepare("UPDATE usuarios SET senha = ? WHERE email = ?").run(hashedAdminPwd, "admin@test.com");
+  try {
+    db.prepare("UPDATE usuarios SET senha = ?").run(hashedAdminPwd);
+    db.prepare("UPDATE clientes SET senha = ?").run(hashedAdminPwd);
+  } catch (e) {
+    console.error("Erro ao atualizar senhas em massa:", e);
   }
 
-  // Ensure Consultant User exists
-  const consultUser = db.prepare("SELECT id FROM usuarios WHERE email = ?").get("consult@test.com") as any;
-  if (!consultUser) {
-    const company = db.prepare("SELECT id FROM empresas LIMIT 1").get() as any;
-    if (company) {
+  const company = db.prepare("SELECT id FROM empresas LIMIT 1").get() as any;
+  if (company) {
+    // Ensure Admin
+    const adminUser = db.prepare("SELECT id FROM usuarios WHERE email = ?").get("admin@test.com") as any;
+    if (!adminUser) {
       db.prepare("INSERT INTO usuarios (empresa_id, nome, email, senha, perfil) VALUES (?, ?, ?, ?, ?)").run(
-        company.id,
-        "Consultor Teste",
-        "consult@test.com",
-        hashedAdminPwd,
-        "consultor"
+        company.id, "Admin Teste", "admin@test.com", hashedAdminPwd, "admin"
       );
+    } else {
+      db.prepare("UPDATE usuarios SET senha = ? WHERE email = ?").run(hashedAdminPwd, "admin@test.com");
     }
-  } else {
-    db.prepare("UPDATE usuarios SET senha = ? WHERE email = ?").run(hashedAdminPwd, "consult@test.com");
-  }
 
-  // Ensure Client User exists
-  const clientUser = db.prepare("SELECT id FROM clientes WHERE email = ?").get("cliente@test.com") as any;
-  if (clientUser) {
-    db.prepare("UPDATE clientes SET senha = ? WHERE email = ?").run(hashedAdminPwd, "cliente@test.com");
+    // Ensure Consultant
+    const consultUser = db.prepare("SELECT id FROM usuarios WHERE email = ?").get("consult@test.com") as any;
+    if (!consultUser) {
+      db.prepare("INSERT INTO usuarios (empresa_id, nome, email, senha, perfil) VALUES (?, ?, ?, ?, ?)").run(
+        company.id, "Consultor Teste", "consult@test.com", hashedAdminPwd, "consultor"
+      );
+    } else {
+      db.prepare("UPDATE usuarios SET senha = ? WHERE email = ?").run(hashedAdminPwd, "consult@test.com");
+    }
+
+    // Ensure Client
+    const clientUser = db.prepare("SELECT id FROM clientes WHERE email = ?").get("cliente@test.com") as any;
+    if (!clientUser) {
+      db.prepare("INSERT INTO clientes (empresa_id, nome, email, senha, status) VALUES (?, ?, ?, ?, ?)").run(
+        company.id, "Loja Exemplo", "cliente@test.com", hashedAdminPwd, "ativo"
+      );
+    } else {
+      db.prepare("UPDATE clientes SET senha = ? WHERE email = ?").run(hashedAdminPwd, "cliente@test.com");
+    }
   }
 
   // Ensure specific categories exist for the first company

@@ -38,7 +38,9 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
         navigate("/");
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || "Erro ao fazer login. Verifique suas credenciais.");
+      console.error("Login Error:", err);
+      const errorMessage = err.response?.data?.error || err.message || "Erro ao fazer login. Verifique suas credenciais.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
