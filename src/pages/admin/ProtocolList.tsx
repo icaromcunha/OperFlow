@@ -1,14 +1,35 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Search, Filter, AlertTriangle, ChevronRight, Loader2, Eye, ChevronLeft } from "lucide-react";
+import { Search, Filter, AlertTriangle, ChevronRight, Loader2, Eye, ChevronLeft, Share2, MessageCircle } from "lucide-react";
 
 export default function ProtocolList() {
   const [protocols, setProtocols] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
+  const navigate = useNavigate();
+
+  const handleShare = (id: number) => {
+    const url = `${window.location.origin}/admin/protocols/${id}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        alert("Link do protocolo copiado!");
+      }).catch(err => {
+        console.error("Erro ao copiar link:", err);
+        prompt("Copie o link abaixo:", url);
+      });
+    } else {
+      prompt("Copie o link abaixo:", url);
+    }
+  };
+
+  const handleWhatsAppShare = (id: number) => {
+    const url = `${window.location.origin}/admin/protocols/${id}`;
+    const text = encodeURIComponent(`OperFlow - Protocolo #PRT-${id}: ${url}`);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  };
 
   useEffect(() => {
     const fetchProtocols = async () => {
@@ -44,7 +65,7 @@ export default function ProtocolList() {
       </div>
 
       <div className="bg-bg-card rounded-xl border border-border-main shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-border-main flex flex-col md:flex-row gap-4 bg-white/5">
+        <div className="p-6 border-b border-border-main flex flex-col md:flex-row gap-4 bg-surface-subtle">
           <div className="flex-1 relative">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
             <input
@@ -56,10 +77,10 @@ export default function ProtocolList() {
             />
           </div>
           <div className="flex gap-2">
-            <button className="px-4 py-2.5 bg-white/5 border border-border-main rounded-lg text-sm font-bold text-text-secondary flex items-center gap-2 hover:bg-white/10 transition-colors">
+            <button className="px-4 py-2.5 bg-surface-subtle border border-border-main rounded-lg text-sm font-bold text-text-secondary flex items-center gap-2 bg-surface-hover transition-colors">
               <Filter size={16} /> Status
             </button>
-            <button className="px-4 py-2.5 bg-white/5 border border-border-main rounded-lg text-sm font-bold text-text-secondary flex items-center gap-2 hover:bg-white/10 transition-colors">
+            <button className="px-4 py-2.5 bg-surface-subtle border border-border-main rounded-lg text-sm font-bold text-text-secondary flex items-center gap-2 bg-surface-hover transition-colors">
               <AlertTriangle size={16} /> Prioridade
             </button>
           </div>
@@ -68,7 +89,7 @@ export default function ProtocolList() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/5 text-text-secondary text-xs font-bold uppercase tracking-wider">
+              <tr className="bg-surface-subtle text-text-secondary text-xs font-bold uppercase tracking-wider">
                 <th className="px-6 py-4">ID</th>
                 <th className="px-6 py-4">Lojista</th>
                 <th className="px-6 py-4">Título / Assunto</th>
@@ -80,7 +101,11 @@ export default function ProtocolList() {
             </thead>
             <tbody className="divide-y divide-border-main">
               {filteredProtocols.map((p) => (
-                <tr key={p.id} className="hover:bg-white/5 transition-colors group">
+                <tr 
+                  key={p.id} 
+                  onClick={() => navigate(`/admin/protocols/${p.id}`)}
+                  className="bg-surface-hover transition-colors group cursor-pointer"
+                >
                   <td className="px-6 py-4 text-sm font-mono text-text-secondary">#OP-{p.id}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -115,7 +140,7 @@ export default function ProtocolList() {
                       p.status === 'aberto' ? 'bg-brand-orange/10 text-brand-orange border-brand-orange/20' :
                       p.status === 'em atendimento' ? 'bg-brand-purple/10 text-brand-purple border-brand-purple/20' :
                       p.status === 'concluido' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                      'bg-white/5 text-text-secondary border-border-main'
+                      'bg-surface-subtle text-text-secondary border-border-main'
                     }`}>
                       {p.status === 'aberto' ? 'Aguardando' : 
                        p.status === 'em atendimento' ? 'Em Revisão' : 
@@ -126,16 +151,45 @@ export default function ProtocolList() {
                     {format(new Date(p.data_criacao), "dd/MM/yy, HH:mm", { locale: ptBR })}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Link to={`/admin/protocols/${p.id}`} className="p-2 hover:bg-white/10 rounded-lg transition-colors inline-block text-brand-orange">
-                      <Eye size={18} />
-                    </Link>
+                    <div className="flex items-center justify-end gap-2">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleShare(p.id);
+                        }}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors inline-block text-text-secondary hover:text-brand-orange"
+                        title="Copiar Link"
+                      >
+                        <Share2 size={18} />
+                      </button>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleWhatsAppShare(p.id);
+                        }}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors inline-block text-text-secondary hover:text-green-500"
+                        title="Compartilhar no WhatsApp"
+                      >
+                        <MessageCircle size={18} />
+                      </button>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/admin/protocols/${p.id}`);
+                        }}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors inline-block text-brand-orange"
+                        title="Ver Detalhes"
+                      >
+                        <Eye size={18} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <div className="p-4 border-t border-border-main bg-white/5 flex items-center justify-between text-sm text-text-secondary">
+        <div className="p-4 border-t border-border-main bg-surface-subtle flex items-center justify-between text-sm text-text-secondary">
           <p>Mostrando {filteredProtocols.length} registros</p>
           <div className="flex items-center gap-2">
             <button className="p-1 rounded hover:bg-white/10 disabled:opacity-50" disabled>

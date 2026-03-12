@@ -64,13 +64,12 @@ export default function ClientLayout({ user, onLogout }: { user: any; onLogout: 
                 exit={{ opacity: 0, x: -20 }}
                 className="flex items-center gap-3 overflow-hidden whitespace-nowrap"
               >
-                <Logo className="size-10 shrink-0" />
-                <span className="font-bold text-xl tracking-tight uppercase italic text-text-primary">OperFlow</span>
+                <Logo className="w-52 h-auto shrink-0" />
               </motion.div>
             )}
           </AnimatePresence>
           {isCollapsed && (
-            <Logo className="size-10 mx-auto" />
+            <Logo className="w-12 h-auto mx-auto" />
           )}
         </div>
 
@@ -84,18 +83,18 @@ export default function ClientLayout({ user, onLogout }: { user: any; onLogout: 
                 title={isCollapsed ? item.label : ""}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${
                   isActive 
-                    ? "bg-brand-purple text-white font-bold shadow-lg shadow-brand-purple/20" 
-                    : "text-text-secondary hover:bg-black/5 dark:hover:bg-white/5 hover:text-text-primary"
+                    ? "bg-brand-orange text-white font-bold shadow-lg shadow-brand-orange/20" 
+                    : "text-text-secondary hover:bg-surface-subtle hover:text-text-primary"
                 }`}
               >
-                <item.icon size={20} className={isActive ? "text-white shrink-0" : "text-text-secondary group-hover:text-white shrink-0"} />
+                <item.icon size={20} className={isActive ? "text-white shrink-0" : "text-text-secondary group-hover:text-brand-orange shrink-0"} />
                 <AnimatePresence>
                   {!isCollapsed && (
                     <motion.span
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -10 }}
-                      className="whitespace-nowrap"
+                      className="whitespace-nowrap text-sm font-semibold"
                     >
                       {item.label}
                     </motion.span>
@@ -110,7 +109,7 @@ export default function ClientLayout({ user, onLogout }: { user: any; onLogout: 
         <div className="px-4 mb-4">
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="w-full flex items-center justify-center p-3 rounded-xl bg-white/5 hover:bg-white/10 text-text-secondary hover:text-white transition-all"
+            className="w-full flex items-center justify-center p-3 rounded-xl bg-surface-subtle bg-surface-hover text-text-secondary hover:text-text-primary transition-all"
           >
             {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
           </button>
@@ -118,14 +117,14 @@ export default function ClientLayout({ user, onLogout }: { user: any; onLogout: 
 
         {/* User Profile in Sidebar */}
         <div className="p-4 border-t border-border-main">
-          <div className={`bg-white/5 rounded-2xl p-3 flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
+          <div className={`bg-surface-subtle rounded-2xl p-3 flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
             <Link 
               to="/profile"
-              className="size-10 rounded-full bg-slate-700 overflow-hidden border-2 border-white/10 shrink-0 hover:border-brand-orange transition-colors flex items-center justify-center"
+              className="size-10 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border-2 border-border-main shrink-0 hover:border-brand-orange transition-colors flex items-center justify-center"
             >
-              {user.avatar ? (
+              {user.avatar_url ? (
                 <img 
-                  src={user.avatar} 
+                  src={user.avatar_url} 
                   alt="Avatar" 
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover"
@@ -162,7 +161,7 @@ export default function ClientLayout({ user, onLogout }: { user: any; onLogout: 
       >
         {/* Header */}
         <header className="h-20 bg-bg-main border-b border-border-main flex items-center justify-between px-10 sticky top-0 z-40 transition-colors duration-200">
-          <h2 className="text-xl font-bold text-text-primary italic uppercase tracking-tighter">OperFlow</h2>
+          <div />
           
           <div className="flex items-center gap-6">
             <div className="relative w-64 lg:w-96 hidden md:block">
@@ -177,7 +176,7 @@ export default function ClientLayout({ user, onLogout }: { user: any; onLogout: 
             <div className="flex items-center gap-2">
               <button 
                 onClick={toggleDarkMode}
-                className="p-2.5 text-text-secondary hover:bg-white/5 rounded-xl transition-colors"
+                className="p-2.5 text-text-secondary bg-surface-hover rounded-xl transition-colors"
                 title="Alternar tema"
               >
                 <Sun className="hidden dark:block size-5" />
@@ -187,7 +186,7 @@ export default function ClientLayout({ user, onLogout }: { user: any; onLogout: 
               <div className="relative">
                 <button 
                   onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                  className="p-2.5 text-text-secondary hover:bg-white/5 rounded-xl relative transition-colors"
+                  className="p-2.5 text-text-secondary bg-surface-hover rounded-xl relative transition-colors"
                 >
                   <Bell size={22} />
                   <span className="absolute top-2 right-2 size-2.5 bg-brand-orange border-2 border-bg-main rounded-full"></span>
@@ -203,13 +202,13 @@ export default function ClientLayout({ user, onLogout }: { user: any; onLogout: 
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         className="absolute right-0 mt-2 w-80 bg-bg-card rounded-2xl shadow-2xl border border-border-main z-50 overflow-hidden"
                       >
-                        <div className="p-4 border-b border-border-main flex justify-between items-center bg-white/5">
+                        <div className="p-4 border-b border-border-main flex justify-between items-center bg-surface-subtle">
                           <h4 className="font-bold text-text-primary">Notificações</h4>
                           <span className="text-[10px] font-black uppercase text-white bg-brand-purple px-2 py-0.5 rounded-full">3 Novas</span>
                         </div>
                         <div className="max-h-96 overflow-y-auto">
                           {notifications.map((n) => (
-                            <div key={n.id} className="p-4 border-b border-border-main hover:bg-white/5 transition-colors cursor-pointer group">
+                            <div key={n.id} className="p-4 border-b border-border-main bg-surface-hover transition-colors cursor-pointer group">
                               <div className="flex gap-3">
                                 <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${
                                   n.type === 'alert' ? 'bg-red-500/10 text-red-500' : 
@@ -229,7 +228,7 @@ export default function ClientLayout({ user, onLogout }: { user: any; onLogout: 
                             </div>
                           ))}
                         </div>
-                        <button className="w-full py-3 text-xs font-bold text-text-secondary hover:text-white transition-colors bg-white/5">
+                        <button className="w-full py-3 text-xs font-bold text-text-secondary hover:text-text-primary transition-colors bg-surface-subtle">
                           Ver todas as notificações
                         </button>
                       </motion.div>
@@ -240,11 +239,11 @@ export default function ClientLayout({ user, onLogout }: { user: any; onLogout: 
 
               <button 
                 onClick={() => navigate("/profile")}
-                className="p-2.5 text-text-secondary hover:bg-white/5 rounded-xl transition-colors flex items-center justify-center"
+                className="p-2.5 text-text-secondary bg-surface-hover rounded-xl transition-colors flex items-center justify-center"
               >
-                {user.avatar ? (
+                {user.avatar_url ? (
                   <div className="size-6 rounded-full overflow-hidden border border-border-main">
-                    <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    <img src={user.avatar_url} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   </div>
                 ) : (
                   <Settings size={22} />

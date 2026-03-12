@@ -37,9 +37,9 @@ router.get("/stats", authenticate, (req: any, res) => {
   let query = `
     SELECT 
       COUNT(*) as total,
-      SUM(CASE WHEN status = 'aberto' THEN 1 ELSE 0 END) as abertos,
-      SUM(CASE WHEN status = 'em atendimento' THEN 1 ELSE 0 END) as em_atendimento,
-      SUM(CASE WHEN status = 'concluido' THEN 1 ELSE 0 END) as concluidos
+      SUM(CASE WHEN p.status = 'aberto' THEN 1 ELSE 0 END) as abertos,
+      SUM(CASE WHEN p.status = 'em atendimento' THEN 1 ELSE 0 END) as em_atendimento,
+      SUM(CASE WHEN p.status = 'concluido' THEN 1 ELSE 0 END) as concluidos
     FROM protocolos p
     JOIN clientes c ON p.cliente_id = c.id
     WHERE p.empresa_id = ?

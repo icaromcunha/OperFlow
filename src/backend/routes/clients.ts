@@ -65,32 +65,43 @@ router.get("/:id", authenticate, (req: any, res) => {
 
 router.patch("/:id", authenticate, (req: any, res) => {
   const { id } = req.params;
-  const { nome, email, telefone, whatsapp_numero, whatsapp_notificacoes_ativas, status } = req.body;
+  const { nome, email, telefone, whatsapp_numero, whatsapp_notificacoes_ativas, status, avatar_url, faturamento, pedidos } = req.body;
   
   db.prepare(`
     UPDATE clientes 
-    SET nome = ?, email = ?, telefone = ?, whatsapp_numero = ?, whatsapp_notificacoes_ativas = ?, status = ?
+    SET nome = ?, email = ?, telefone = ?, whatsapp_numero = ?, whatsapp_notificacoes_ativas = ?, status = ?, avatar_url = ?, faturamento = ?, pedidos = ?
     WHERE id = ?
-  `).run(nome, email, telefone, whatsapp_numero, whatsapp_notificacoes_ativas ? 1 : 0, status || 'ativo', id);
+  `).run(
+    nome, 
+    email, 
+    telefone, 
+    whatsapp_numero, 
+    whatsapp_notificacoes_ativas ? 1 : 0, 
+    status || 'ativo', 
+    avatar_url || null, 
+    faturamento || 0, 
+    pedidos || 0, 
+    id
+  );
   
   res.json({ success: true });
 });
 
 router.get("/me", authenticate, (req: any, res) => {
   const { id } = req.user;
-  const client = db.prepare("SELECT id, nome, email, telefone, whatsapp_numero, whatsapp_notificacoes_ativas FROM clientes WHERE id = ?").get(id);
+  const client = db.prepare("SELECT id, nome, email, telefone, whatsapp_numero, whatsapp_notificacoes_ativas, avatar_url FROM clientes WHERE id = ?").get(id);
   res.json(client);
 });
 
 router.patch("/me", authenticate, (req: any, res) => {
   const { id } = req.user;
-  const { nome, email, telefone, whatsapp_numero, whatsapp_notificacoes_ativas } = req.body;
+  const { nome, email, telefone, whatsapp_numero, whatsapp_notificacoes_ativas, avatar_url } = req.body;
   
   db.prepare(`
     UPDATE clientes 
-    SET nome = ?, email = ?, telefone = ?, whatsapp_numero = ?, whatsapp_notificacoes_ativas = ?
+    SET nome = ?, email = ?, telefone = ?, whatsapp_numero = ?, whatsapp_notificacoes_ativas = ?, avatar_url = ?
     WHERE id = ?
-  `).run(nome, email, telefone, whatsapp_numero, whatsapp_notificacoes_ativas ? 1 : 0, id);
+  `).run(nome, email, telefone, whatsapp_numero, whatsapp_notificacoes_ativas ? 1 : 0, avatar_url || null, id);
   
   res.json({ success: true });
 });

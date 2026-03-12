@@ -19,7 +19,8 @@ import {
   History,
   ChevronLeft,
   ChevronDown,
-  Settings
+  Settings,
+  Share2
 } from "lucide-react";
 
 export default function ProtocolDetail() {
@@ -30,6 +31,15 @@ export default function ProtocolDetail() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
+
+  const handleShare = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      alert("Link do protocolo copiado para a área de transferência!");
+    }).catch(err => {
+      console.error('Erro ao copiar link: ', err);
+    });
+  };
 
   const fetchProtocol = async () => {
     try {
@@ -107,12 +117,20 @@ export default function ProtocolDetail() {
           Voltar à Fila
         </button>
         <div className="flex items-center gap-3">
+          <button 
+            onClick={handleShare}
+            className="flex items-center gap-2 px-3 py-1.5 bg-surface-subtle hover:bg-surface-hover border border-border-main rounded-lg text-xs font-bold text-text-secondary transition-colors"
+            title="Compartilhar Protocolo"
+          >
+            <Share2 size={14} />
+            Compartilhar
+          </button>
           <span className="text-xs font-mono text-text-secondary">ID: #OP-{protocol.id}</span>
           <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
             protocol.status === 'aberto' ? 'bg-brand-orange/10 text-brand-orange border-brand-orange/20' :
             protocol.status === 'em atendimento' ? 'bg-brand-purple/10 text-brand-purple border-brand-purple/20' :
             protocol.status === 'concluido' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-            'bg-white/5 text-text-secondary border-border-main'
+            'bg-surface-subtle text-text-secondary border-border-main'
           }`}>
             {protocol.status}
           </div>
@@ -129,7 +147,7 @@ export default function ProtocolDetail() {
               </div>
               <h1 className="text-2xl font-black tracking-tight text-text-primary">{protocol.titulo}</h1>
             </div>
-            <p className="text-text-secondary leading-relaxed bg-white/5 p-4 rounded-xl border border-border-main italic">
+            <p className="text-text-secondary leading-relaxed bg-surface-subtle p-4 rounded-xl border border-border-main italic">
               "{protocol.descricao}"
             </p>
           </div>
@@ -162,7 +180,7 @@ export default function ProtocolDetail() {
                     </div>
                     <div className={`p-5 rounded-2xl shadow-sm border ${
                       isWhatsApp || isStatusChange
-                        ? 'bg-white/5 border-border-main'
+                        ? 'bg-surface-subtle border-border-main'
                         : i.autor_tipo === 'admin' 
                           ? 'bg-brand-orange/5 border-brand-orange/10' 
                           : 'bg-bg-card border-border-main'
@@ -209,11 +227,11 @@ export default function ProtocolDetail() {
               </div>
               <div className="flex justify-between items-center flex-wrap gap-4">
                 <div className="flex gap-2">
-                  <button type="button" className="p-2.5 text-text-secondary hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2">
+                  <button type="button" className="p-2.5 text-text-secondary bg-surface-hover rounded-lg transition-colors flex items-center gap-2">
                     <Paperclip size={18} />
                     <span className="text-xs font-bold uppercase tracking-widest">Anexar</span>
                   </button>
-                  <button type="button" className="p-2.5 text-text-secondary hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2">
+                  <button type="button" className="p-2.5 text-text-secondary bg-surface-hover rounded-lg transition-colors flex items-center gap-2">
                     <EyeOff size={18} />
                     <span className="text-xs font-bold uppercase tracking-widest">Nota Interna</span>
                   </button>
@@ -270,7 +288,7 @@ export default function ProtocolDetail() {
                 <AlertCircle size={14} />
                 Nível de Urgência
               </label>
-              <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-border-main">
+              <div className="flex items-center gap-3 p-3 bg-surface-subtle rounded-xl border border-border-main">
                 <span className={`size-3 rounded-full shadow-sm ${
                   protocol.prioridade_name === 'Alta' ? 'bg-red-500 animate-pulse' :
                   protocol.prioridade_name === 'Média' ? 'bg-amber-500' : 'bg-brand-orange'
@@ -293,7 +311,7 @@ export default function ProtocolDetail() {
                   <p className="text-xs text-text-secondary font-medium">{protocol.cliente_email}</p>
                 </div>
               </div>
-              <button className="w-full py-2.5 bg-bg-card hover:bg-white/5 text-text-primary rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2 border border-border-main">
+              <button className="w-full py-2.5 bg-bg-card bg-surface-hover text-text-primary rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2 border border-border-main">
                 <History size={16} />
                 Ver Histórico do Lojista
               </button>
@@ -306,7 +324,7 @@ export default function ProtocolDetail() {
               </label>
               <div className="flex flex-col gap-1">
                 <span className="text-3xl font-black tracking-tighter text-red-500">02:45:00</span>
-                <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-surface-subtle rounded-full overflow-hidden">
                   <div className="h-full bg-red-500 w-3/4"></div>
                 </div>
               </div>

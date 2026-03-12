@@ -58,6 +58,34 @@ export interface Interaction {
   autor_nome?: string;
 }
 
+export interface Marketplace {
+  id: number;
+  cliente_id: number;
+  nome: string;
+  status: 'ativo' | 'inativo';
+  data_conexao: string;
+  vendas_mes?: number;
+}
+
+export interface Insight {
+  id: number;
+  cliente_id: number;
+  consultor_id: number;
+  texto: string;
+  data_criacao: string;
+  visivel_cliente: boolean;
+}
+
+export interface EvolutionHistory {
+  id: number;
+  cliente_id: number;
+  consultor_id: number;
+  titulo: string;
+  descricao: string;
+  data: string;
+  visivel_cliente: boolean;
+}
+
 export interface DashboardStats {
   total: number;
   abertos: number;

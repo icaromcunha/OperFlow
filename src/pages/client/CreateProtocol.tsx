@@ -81,7 +81,7 @@ export default function CreateProtocol() {
             value={formData.titulo}
             onChange={(e) => setFormData({ ...formData, titulo: e.target.value })}
             placeholder="Ex: Atualização de estoque curva A - Mercado Livre"
-            className="w-full p-4 bg-white/5 border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all text-text-primary placeholder:text-text-secondary/50"
+            className="input-main w-full"
           />
         </div>
 
@@ -96,7 +96,7 @@ export default function CreateProtocol() {
                 required
                 value={formData.categoria_id}
                 onChange={(e) => setFormData({ ...formData, categoria_id: e.target.value })}
-                className="w-full p-4 bg-white/5 border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all appearance-none text-text-primary"
+                className="input-main w-full appearance-none pr-12"
               >
                 {config?.categorias.map((c: any) => (
                   <option key={c.id} value={c.id} className="bg-bg-card text-text-primary">{c.nome}</option>
@@ -115,7 +115,7 @@ export default function CreateProtocol() {
                 required
                 value={formData.prioridade_id}
                 onChange={(e) => setFormData({ ...formData, prioridade_id: e.target.value })}
-                className="w-full p-4 bg-white/5 border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all appearance-none text-text-primary"
+                className="input-main w-full appearance-none pr-12"
               >
                 {config?.prioridades.map((p: any) => (
                   <option key={p.id} value={p.id} className="bg-bg-card text-text-primary">{p.nome}</option>
@@ -137,7 +137,7 @@ export default function CreateProtocol() {
             onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
             placeholder="Descreva detalhadamente o que precisa ser feito ou o problema identificado..."
             rows={6}
-            className="w-full p-5 bg-white/5 border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all resize-none text-text-primary placeholder:text-text-secondary/50"
+            className="input-main w-full resize-none"
           />
         </div>
 

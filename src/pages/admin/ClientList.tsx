@@ -60,7 +60,7 @@ export default function ClientList() {
       </div>
 
       <div className="bg-bg-card rounded-2xl border border-border-main shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-border-main bg-white/5 flex items-center justify-between">
+        <div className="p-6 border-b border-border-main bg-surface-subtle flex items-center justify-between">
           <div className="relative max-w-md flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary size-5" />
             <input
@@ -72,7 +72,7 @@ export default function ClientList() {
             />
           </div>
           <div className="flex items-center gap-2">
-            <button className="p-2.5 bg-white/5 text-text-secondary rounded-xl hover:bg-white/10 transition-colors">
+            <button className="p-2.5 bg-surface-subtle text-text-secondary rounded-xl bg-surface-hover transition-colors">
               <LayoutGrid size={20} />
             </button>
           </div>
@@ -81,7 +81,7 @@ export default function ClientList() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/5 text-text-secondary text-[10px] font-black uppercase tracking-widest">
+              <tr className="bg-surface-subtle text-text-secondary text-[10px] font-black uppercase tracking-widest">
                 <th className="px-6 py-4">Nome do Cliente</th>
                 <th className="px-6 py-4">Canais Ativos</th>
                 <th className="px-6 py-4">Protocolos Abertos</th>
@@ -94,7 +94,7 @@ export default function ClientList() {
               {filteredClients.map((c) => (
                 <tr 
                   key={c.id} 
-                  className="hover:bg-white/5 transition-colors cursor-pointer group"
+                  className="bg-surface-hover transition-colors cursor-pointer group"
                   onClick={() => navigate(`/admin/clients/${c.id}`)}
                 >
                   <td className="px-6 py-4">
@@ -129,10 +129,10 @@ export default function ClientList() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button className="p-2 hover:bg-white/5 rounded-lg transition-colors text-text-secondary hover:text-primary">
+                      <button className="p-2 bg-surface-hover rounded-lg transition-colors text-text-secondary hover:text-brand-orange">
                         <ExternalLink size={18} />
                       </button>
-                      <button className="p-2 hover:bg-white/5 rounded-lg transition-colors text-text-secondary hover:text-primary">
+                      <button className="p-2 bg-surface-hover rounded-lg transition-colors text-text-secondary hover:text-brand-orange">
                         <MoreVertical size={18} />
                       </button>
                     </div>

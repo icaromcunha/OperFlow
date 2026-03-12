@@ -27,6 +27,7 @@ export function initDb() {
       senha TEXT NOT NULL,
       perfil TEXT NOT NULL, -- 'admin', 'consultor'
       status TEXT DEFAULT 'online',
+      avatar_url TEXT,
       FOREIGN KEY (empresa_id) REFERENCES empresas(id)
     )
   `);
@@ -44,6 +45,9 @@ export function initDb() {
       whatsapp_numero TEXT,
       whatsapp_notificacoes_ativas INTEGER DEFAULT 0,
       status TEXT DEFAULT 'ativo',
+      avatar_url TEXT,
+      faturamento REAL DEFAULT 0,
+      pedidos INTEGER DEFAULT 0,
       FOREIGN KEY (empresa_id) REFERENCES empresas(id),
       FOREIGN KEY (consultor_id) REFERENCES usuarios(id)
     )
@@ -55,6 +59,10 @@ export function initDb() {
   } catch (e) {
     // Column already exists
   }
+
+  try {
+    db.prepare("ALTER TABLE usuarios ADD COLUMN avatar_url TEXT").run();
+  } catch (e) {}
   
   try {
     db.prepare("ALTER TABLE clientes ADD COLUMN consultor_id INTEGER").run();
@@ -63,6 +71,24 @@ export function initDb() {
   try {
     db.prepare("ALTER TABLE clientes ADD COLUMN whatsapp_numero TEXT").run();
     db.prepare("ALTER TABLE clientes ADD COLUMN whatsapp_notificacoes_ativas INTEGER DEFAULT 0").run();
+  } catch (e) {}
+
+  try {
+    db.prepare("ALTER TABLE clientes ADD COLUMN avatar_url TEXT").run();
+  } catch (e) {}
+
+  try {
+    db.prepare("ALTER TABLE clientes ADD COLUMN faturamento REAL DEFAULT 0").run();
+    db.prepare("ALTER TABLE clientes ADD COLUMN pedidos INTEGER DEFAULT 0").run();
+  } catch (e) {}
+
+  try {
+    db.prepare("ALTER TABLE cliente_evolucao ADD COLUMN visivel_cliente INTEGER DEFAULT 1").run();
+  } catch (e) {}
+
+  try {
+    db.prepare("ALTER TABLE insights ADD COLUMN visivel_cliente INTEGER DEFAULT 1").run();
+    db.prepare("ALTER TABLE insights ADD COLUMN consultor_id INTEGER").run();
   } catch (e) {}
 
   // Categories
@@ -144,6 +170,7 @@ export function initDb() {
       consultor_id INTEGER NOT NULL,
       titulo TEXT NOT NULL,
       descricao TEXT NOT NULL,
+      visivel_cliente INTEGER DEFAULT 1,
       data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (cliente_id) REFERENCES clientes(id),
       FOREIGN KEY (consultor_id) REFERENCES usuarios(id)
@@ -155,10 +182,13 @@ export function initDb() {
     CREATE TABLE IF NOT EXISTS insights (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       cliente_id INTEGER NOT NULL,
+      consultor_id INTEGER,
       titulo TEXT NOT NULL,
       descricao TEXT NOT NULL,
+      visivel_cliente INTEGER DEFAULT 1,
       data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+      FOREIGN KEY (cliente_id) REFERENCES clientes(id),
+      FOREIGN KEY (consultor_id) REFERENCES usuarios(id)
     )
   `);
 
@@ -366,8 +396,8 @@ function seedData() {
     "11999999999"
   ).lastInsertRowid;
 
-  // Create 20 test clients for the consultant
-  for (let i = 1; i <= 20; i++) {
+  // Create 50 test clients for the consultant
+  for (let i = 1; i <= 50; i++) {
     db.prepare("INSERT INTO clientes (empresa_id, consultor_id, nome, email, senha, telefone) VALUES (?, ?, ?, ?, ?, ?)").run(
       companyId,
       consultorId,
@@ -443,10 +473,10 @@ function seedData() {
   const prioIds = priorities.map(p => db.prepare("INSERT INTO prioridades (empresa_id, nome, tempo_sla) VALUES (?, ?, ?)").run(companyId, p.name, p.sla).lastInsertRowid);
 
   // Create some fake protocols
-  for (let i = 1; i <= 20; i++) {
+  for (let i = 1; i <= 50; i++) {
     db.prepare(`
-      INSERT INTO protocolos (empresa_id, cliente_id, titulo, descricao, categoria_id, prioridade_id, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO protocolos (empresa_id, cliente_id, titulo, descricao, categoria_id, prioridade_id, status, responsavel_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       companyId,
       1,
@@ -454,7 +484,8 @@ function seedData() {
       `Descrição detalhada do protocolo de teste número ${i}.`,
       catIds[i % catIds.length],
       prioIds[i % prioIds.length],
-      i % 5 === 0 ? 'concluido' : (i % 4 === 0 ? 'em atendimento' : 'aberto')
+      i % 5 === 0 ? 'concluido' : (i % 4 === 0 ? 'em atendimento' : 'aberto'),
+      consultorId
     );
   }
 }

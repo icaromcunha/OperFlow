@@ -20,8 +20,7 @@ import Insights from "./pages/admin/Insights";
 import AdminReports from "./pages/admin/Reports";
 import AdminTeam from "./pages/admin/Team";
 import AdminSettings from "./pages/admin/Settings";
-import AdminLogin from "./pages/admin/Login";
-import ClientLogin from "./pages/client/Login";
+import Login from "./pages/shared/Login";
 import ClientDashboard from "./pages/client/Dashboard";
 import CreateProtocol from "./pages/client/CreateProtocol";
 import ClientProtocolDetail from "./pages/client/ProtocolDetail";
@@ -64,13 +63,12 @@ export default function App() {
     <ThemeProvider>
       <BrowserRouter>
         <Routes>
-          {/* Unified Login Routes */}
-          <Route path="/login" element={<ClientLogin onLogin={handleLogin} />} />
-          <Route path="/admin/login" element={<AdminLogin onLogin={handleLogin} />} />
+          {/* Unified Login Route */}
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
 
           {/* Admin Routes */}
-          <Route path="/admin" element={user?.type === 'admin' ? <AdminLayout user={user} onLogout={handleLogout} /> : <Navigate to="/admin/login" />}>
-            <Route index element={<AdminDashboard />} />
+          <Route path="/admin" element={user?.type === 'admin' ? <AdminLayout user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}>
+            <Route index element={<AdminDashboard user={user} />} />
             <Route path="queue" element={<GlobalQueue />} />
             <Route path="clients" element={<ClientList />} />
             <Route path="clients/:id" element={<ClientProfile />} />

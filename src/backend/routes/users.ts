@@ -38,4 +38,36 @@ router.post("/", authenticate, async (req: any, res) => {
   }
 });
 
+router.get("/me", authenticate, (req: any, res) => {
+  const { id } = req.user;
+  const user = db.prepare("SELECT id, nome, email, perfil, status, avatar_url FROM usuarios WHERE id = ?").get(id);
+  res.json(user);
+});
+
+router.patch("/me", authenticate, async (req: any, res) => {
+  const { id } = req.user;
+  const { nome, email, avatar_url, senha } = req.body;
+  
+  try {
+    if (senha) {
+      const hashedPassword = await bcrypt.hash(senha, 10);
+      db.prepare(`
+        UPDATE usuarios 
+        SET nome = ?, email = ?, avatar_url = ?, senha = ?
+        WHERE id = ?
+      `).run(nome, email, avatar_url || null, hashedPassword, id);
+    } else {
+      db.prepare(`
+        UPDATE usuarios 
+        SET nome = ?, email = ?, avatar_url = ?
+        WHERE id = ?
+      `).run(nome, email, avatar_url || null, id);
+    }
+    
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;

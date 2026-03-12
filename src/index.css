@@ -1,13 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
   --color-brand-orange: #FF7A18;
-  --color-brand-orange-light: #FF9A3C;
   --color-brand-purple: #7B3FE4;
-  --color-brand-purple-dark: #5A2DBF;
   
   /* Dynamic colors based on CSS variables */
   --color-bg-main: var(--bg-main);
@@ -15,6 +17,7 @@
   --color-border-main: var(--border-main);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
+  --color-surface-subtle: var(--surface-subtle);
   
   --color-primary: #FF7A18;
   --color-accent: #7B3FE4;
@@ -22,40 +25,56 @@
 
 @layer base {
   :root {
-    --bg-main: #F9FAFB;
+    --bg-main: #F8FAFC;
     --bg-card: #FFFFFF;
-    --border-main: #E5E7EB;
-    --text-primary: #111827;
-    --text-secondary: #4B5563;
+    --border-main: #E2E8F0;
+    --text-primary: #0F172A;
+    --text-secondary: #64748B;
+    --surface-subtle: #F8FAFC;
   }
 
   .dark {
-    --bg-main: #0F0F13;
-    --bg-card: #1A1A22;
-    --border-main: #2A2A35;
-    --text-primary: #FFFFFF;
-    --text-secondary: #A0A0B0;
+    --bg-main: #020617;
+    --bg-card: #0F172A;
+    --border-main: #1E293B;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --surface-subtle: rgba(30, 41, 59, 0.3);
   }
 
   body {
-    @apply bg-bg-main text-text-primary transition-colors duration-200 font-sans;
+    @apply bg-bg-main text-text-primary transition-colors duration-200 font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold tracking-tight;
   }
 }
 
-.btn-primary {
-  @apply bg-gradient-to-br from-[#FF7A18] to-[#7B3FE4] hover:from-[#FF9A3C] hover:to-[#8B4DFF] text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg shadow-orange-500/10 active:scale-[0.98];
-}
+@layer components {
+  .input-main {
+    @apply bg-white dark:bg-slate-900 border border-border-main rounded-xl p-4 text-text-primary focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange outline-none transition-all placeholder:text-text-secondary/40;
+  }
 
-.btn-secondary {
-  @apply bg-transparent border border-border-main hover:bg-black/5 dark:hover:bg-white/5 text-text-primary font-bold py-3 px-6 rounded-xl transition-all active:scale-[0.98];
-}
+  .btn-primary {
+    @apply bg-brand-orange hover:bg-brand-orange/90 text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg shadow-orange-500/10 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
 
-.card-main {
-  @apply bg-bg-card border border-border-main rounded-[12px] shadow-sm;
-}
+  .btn-secondary {
+    @apply bg-bg-card border border-border-main hover:bg-slate-50 dark:hover:bg-slate-800 text-text-primary font-bold py-4 px-8 rounded-xl transition-all active:scale-[0.98];
+  }
 
-.input-main {
-  @apply bg-bg-card border border-border-main rounded-xl p-4 text-text-primary focus:ring-2 focus:ring-[#7B3FE4] focus:border-transparent outline-none transition-all;
+  .card-main {
+    @apply bg-bg-card border border-border-main rounded-2xl shadow-sm overflow-hidden transition-all hover:shadow-md hover:border-border-main/80;
+  }
+
+  .data-grid {
+    @apply border border-border-main rounded-xl overflow-hidden bg-bg-card;
+  }
+
+  .data-row {
+    @apply border-b border-border-main last:border-0 hover:bg-surface-subtle transition-colors;
+  }
 }
 
 .material-symbols-outlined {

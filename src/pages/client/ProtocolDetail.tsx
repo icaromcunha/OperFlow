@@ -16,7 +16,8 @@ import {
   Paperclip,
   ChevronLeft,
   History,
-  Info
+  Info,
+  Share2
 } from "lucide-react";
 
 export default function ProtocolDetail() {
@@ -26,6 +27,13 @@ export default function ProtocolDetail() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+
+  const handleShare = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      alert("Link do protocolo copiado!");
+    });
+  };
 
   const fetchProtocol = async () => {
     try {
@@ -81,32 +89,42 @@ export default function ProtocolDetail() {
           <ChevronLeft size={20} className="transition-transform group-hover:-translate-x-1" />
           Voltar ao Painel
         </button>
-        <div className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border ${
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={handleShare}
+            className="flex items-center gap-2 px-3 py-1.5 bg-surface-subtle hover:bg-surface-hover border border-border-main rounded-lg text-[10px] font-black uppercase tracking-widest text-text-secondary transition-colors"
+            title="Compartilhar Protocolo"
+          >
+            <Share2 size={14} />
+            Compartilhar
+          </button>
+          <div className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border ${
           protocol.status === 'aberto' ? 'bg-brand-orange/10 text-brand-orange border-brand-orange/20' :
           protocol.status === 'em atendimento' ? 'bg-brand-purple/10 text-brand-purple border-brand-purple/20' :
           protocol.status === 'concluido' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-          'bg-white/5 text-text-secondary border-border-main'
+          'bg-surface-subtle text-text-secondary border-border-main'
         }`}>
           {protocol.status === 'aberto' ? 'Aguardando Análise' : 
            protocol.status === 'em atendimento' ? 'Em Revisão' : 
            protocol.status === 'concluido' ? 'Operação Finalizada' : 'Pendente'}
         </div>
       </div>
+    </div>
 
-      <div className="bg-bg-card p-8 md:p-12 rounded-2xl border border-border-main shadow-xl">
+    <div className="bg-bg-card p-8 md:p-12 rounded-2xl border border-border-main shadow-xl">
         <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
-          <span className="text-xs font-mono text-text-secondary bg-white/5 px-3 py-1 rounded-lg self-start border border-border-main">
+          <span className="text-xs font-mono text-text-secondary bg-surface-subtle px-3 py-1 rounded-lg self-start border border-border-main">
             #OP-{format(new Date(protocol.data_criacao), "yyMM")}-{String(protocol.id).padStart(3, '0')}
           </span>
           <h1 className="text-3xl font-black tracking-tight text-text-primary">{protocol.titulo}</h1>
         </div>
         
         <div className="flex flex-wrap gap-4 mb-8">
-          <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-border-main">
+          <div className="flex items-center gap-2 bg-surface-subtle px-4 py-2 rounded-xl border border-border-main">
             <Info size={14} className="text-brand-orange" />
             <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">{protocol.categoria_nome}</span>
           </div>
-          <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-border-main">
+          <div className="flex items-center gap-2 bg-surface-subtle px-4 py-2 rounded-xl border border-border-main">
             <AlertCircle size={14} className="text-brand-orange" />
             <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">{protocol.prioridade_nome}</span>
           </div>
@@ -116,7 +134,7 @@ export default function ProtocolDetail() {
           </div>
         </div>
 
-        <div className="bg-white/5 p-6 rounded-2xl border border-border-main italic relative">
+        <div className="bg-surface-subtle p-6 rounded-2xl border border-border-main italic relative">
           <div className="absolute -top-3 -left-3 bg-bg-card rounded-full p-2 shadow-sm border border-border-main">
             <MessageSquare size={16} className="text-brand-orange" />
           </div>
@@ -143,7 +161,7 @@ export default function ProtocolDetail() {
             if (isSystem) {
               return (
                 <div key={i.id} className="flex justify-center">
-                  <div className="flex items-center gap-3 px-6 py-2 bg-white/5 rounded-full border border-border-main">
+                  <div className="flex items-center gap-3 px-6 py-2 bg-surface-subtle rounded-full border border-border-main">
                     {isWhatsApp ? <Smartphone size={14} className="text-emerald-500" /> : <CheckCircle2 size={14} className="text-amber-500" />}
                     <span className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">
                       {i.mensagem} • {format(new Date(i.data_envio), "HH:mm")}
@@ -190,7 +208,7 @@ export default function ProtocolDetail() {
               />
             </div>
             <div className="flex justify-between items-center">
-              <button type="button" className="p-3 text-text-secondary hover:bg-white/5 rounded-xl transition-colors flex items-center gap-2">
+              <button type="button" className="p-3 text-text-secondary bg-surface-hover rounded-xl transition-colors flex items-center gap-2">
                 <Paperclip size={18} />
                 <span className="text-xs font-bold uppercase tracking-widest">Anexar Arquivo</span>
               </button>

@@ -11,7 +11,9 @@ import {
   UserPlus, 
   MessageSquare, 
   ArrowRightLeft, 
-  Clock
+  Clock,
+  Share2,
+  MessageCircle
 } from "lucide-react";
 
 export default function GlobalQueue() {
@@ -20,6 +22,26 @@ export default function GlobalQueue() {
   const [filter, setFilter] = useState("");
   const [selectedClient, setSelectedClient] = useState("Todos os Clientes");
   const navigate = useNavigate();
+
+  const handleShare = (id: number) => {
+    const url = `${window.location.origin}/admin/protocols/${id}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        alert("Link do protocolo copiado!");
+      }).catch(err => {
+        console.error("Erro ao copiar link:", err);
+        prompt("Copie o link abaixo:", url);
+      });
+    } else {
+      prompt("Copie o link abaixo:", url);
+    }
+  };
+
+  const handleWhatsAppShare = (id: number) => {
+    const url = `${window.location.origin}/admin/protocols/${id}`;
+    const text = encodeURIComponent(`OperFlow - Protocolo #PRT-${id}: ${url}`);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  };
 
   const handleTakeProtocol = async (id: number) => {
     try {
@@ -77,12 +99,12 @@ export default function GlobalQueue() {
             placeholder="Buscar por ID, cliente ou assunto..."
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="w-full pl-12 pr-4 py-2.5 bg-bg-card border border-border-main rounded-xl text-sm focus:ring-2 focus:ring-primary transition-all text-text-primary"
+            className="w-full pl-12 pr-4 py-2.5 bg-bg-card border border-border-main rounded-xl text-sm focus:ring-2 focus:ring-brand-purple transition-all text-text-primary"
           />
         </div>
         
         <div className="flex items-center gap-2">
-          <select className="bg-bg-card border border-border-main rounded-xl px-4 py-2.5 text-sm font-bold text-text-secondary focus:ring-2 focus:ring-primary">
+          <select className="bg-bg-card border border-border-main rounded-xl px-4 py-2.5 text-sm font-bold text-text-secondary focus:ring-2 focus:ring-brand-purple">
             <option>Todas as Prioridades</option>
             <option>Crítica</option>
             <option>Alta</option>
@@ -92,14 +114,14 @@ export default function GlobalQueue() {
           <select 
             value={selectedClient}
             onChange={(e) => setSelectedClient(e.target.value)}
-            className="bg-bg-card border border-border-main rounded-xl px-4 py-2.5 text-sm font-bold text-text-secondary focus:ring-2 focus:ring-primary"
+            className="bg-bg-card border border-border-main rounded-xl px-4 py-2.5 text-sm font-bold text-text-secondary focus:ring-2 focus:ring-brand-purple"
           >
             <option>Todos os Clientes</option>
             {clients.map(c => (
               <option key={c.id} value={c.nome}>{c.nome}</option>
             ))}
           </select>
-          <button className="p-2.5 bg-white/5 text-text-secondary rounded-xl hover:bg-white/10 transition-colors">
+          <button className="p-2.5 bg-surface-subtle text-text-secondary rounded-xl bg-surface-hover transition-colors">
             <Filter size={20} />
           </button>
         </div>
@@ -110,7 +132,7 @@ export default function GlobalQueue() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/5 text-text-secondary text-[10px] font-black uppercase tracking-widest">
+              <tr className="bg-surface-subtle text-text-secondary text-[10px] font-black uppercase tracking-widest">
                 <th className="px-6 py-4">ID Protocolo</th>
                 <th className="px-6 py-4">Cliente</th>
                 <th className="px-6 py-4">Categoria</th>
@@ -123,18 +145,22 @@ export default function GlobalQueue() {
             </thead>
             <tbody className="divide-y divide-border-main">
               {filteredProtocols.map((p) => (
-                <tr key={p.id} className="hover:bg-white/5 transition-colors group">
+                <tr 
+                  key={p.id} 
+                  onClick={() => navigate(`/admin/protocols/${p.id}`)}
+                  className="bg-surface-hover transition-colors group cursor-pointer"
+                >
                   <td className="px-6 py-4 text-xs font-mono text-text-secondary">#PRT-{p.id}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="size-8 rounded-lg bg-white/5 flex items-center justify-center text-text-secondary font-bold text-xs">
+                      <div className="size-8 rounded-lg bg-surface-subtle flex items-center justify-center text-text-secondary font-bold text-xs">
                         {p.cliente_nome?.substring(0, 2).toUpperCase()}
                       </div>
                       <span className="text-sm font-bold text-text-primary">{p.cliente_nome}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-xs font-medium text-text-secondary bg-white/5 px-2 py-1 rounded">
+                    <span className="text-xs font-medium text-text-secondary bg-surface-subtle px-2 py-1 rounded">
                       {p.categoria_nome || "Geral"}
                     </span>
                   </td>
@@ -155,7 +181,7 @@ export default function GlobalQueue() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <div className="size-6 rounded-full bg-white/5 flex items-center justify-center text-[10px] font-bold text-text-secondary">
+                      <div className="size-6 rounded-full bg-surface-subtle flex items-center justify-center text-[10px] font-bold text-text-secondary">
                         {p.consultor_nome ? p.consultor_nome.substring(0, 2).toUpperCase() : "?"}
                       </div>
                       <span className="text-xs text-text-secondary">
@@ -169,27 +195,60 @@ export default function GlobalQueue() {
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button 
-                        onClick={() => handleTakeProtocol(p.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTakeProtocol(p.id);
+                        }}
                         title="Assumir Protocolo" 
-                        className="p-2 text-text-secondary hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
+                        className="p-2 text-text-secondary hover:text-brand-orange hover:bg-brand-orange/10 rounded-lg transition-all"
                       >
                         <UserPlus size={18} />
                       </button>
                       <button 
-                        onClick={() => navigate(`/admin/protocols/${p.id}`)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/admin/protocols/${p.id}`);
+                        }}
                         title="Responder" 
-                        className="p-2 text-text-secondary hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
+                        className="p-2 text-text-secondary hover:text-brand-orange hover:bg-brand-orange/10 rounded-lg transition-all"
                       >
                         <MessageSquare size={18} />
                       </button>
                       <button 
-                        onClick={() => handleChangePriority(p.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleChangePriority(p.id);
+                        }}
                         title="Alterar Prioridade" 
-                        className="p-2 text-text-secondary hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
+                        className="p-2 text-text-secondary hover:text-brand-orange hover:bg-brand-orange/10 rounded-lg transition-all"
                       >
                         <ArrowRightLeft size={18} />
                       </button>
-                      <button title="Mais Ações" className="p-2 text-text-secondary hover:text-primary hover:bg-primary/10 rounded-lg transition-all">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleShare(p.id);
+                        }}
+                        title="Copiar Link" 
+                        className="p-2 text-text-secondary hover:text-brand-orange hover:bg-brand-orange/10 rounded-lg transition-all"
+                      >
+                        <Share2 size={18} />
+                      </button>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleWhatsAppShare(p.id);
+                        }}
+                        title="Compartilhar no WhatsApp" 
+                        className="p-2 text-text-secondary hover:text-green-500 hover:bg-green-500/10 rounded-lg transition-all"
+                      >
+                        <MessageCircle size={18} />
+                      </button>
+                      <button 
+                        onClick={(e) => e.stopPropagation()}
+                        title="Mais Ações" 
+                        className="p-2 text-text-secondary hover:text-brand-orange hover:bg-brand-orange/10 rounded-lg transition-all"
+                      >
                         <MoreVertical size={18} />
                       </button>
                     </div>

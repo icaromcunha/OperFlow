@@ -45,7 +45,7 @@ export default function AdminCatalog() {
       </div>
 
       <div className="bg-bg-card rounded-2xl border border-border-main shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-border-main flex flex-col md:flex-row gap-4 bg-white/5">
+        <div className="p-6 border-b border-border-main flex flex-col md:flex-row gap-4 bg-surface-subtle">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary size-5" />
             <input
@@ -57,10 +57,10 @@ export default function AdminCatalog() {
             />
           </div>
           <div className="flex gap-2">
-            <button className="px-4 py-2.5 bg-bg-card border border-border-main rounded-xl text-sm font-bold text-text-secondary flex items-center gap-2 hover:bg-white/5 transition-colors">
+            <button className="px-4 py-2.5 bg-bg-card border border-border-main rounded-xl text-sm font-bold text-text-secondary flex items-center gap-2 bg-surface-hover transition-colors">
               <Filter size={18} /> Filtros
             </button>
-            <button className="px-4 py-2.5 bg-bg-card border border-border-main rounded-xl text-sm font-bold text-text-secondary flex items-center gap-2 hover:bg-white/5 transition-colors">
+            <button className="px-4 py-2.5 bg-bg-card border border-border-main rounded-xl text-sm font-bold text-text-secondary flex items-center gap-2 bg-surface-hover transition-colors">
               <Download size={18} /> Exportar
             </button>
           </div>
@@ -69,7 +69,7 @@ export default function AdminCatalog() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/5 text-text-secondary text-xs font-bold uppercase tracking-wider">
+              <tr className="bg-surface-subtle text-text-secondary text-xs font-bold uppercase tracking-wider">
                 <th className="px-6 py-4">Produto / SKU</th>
                 <th className="px-6 py-4">Lojista</th>
                 <th className="px-6 py-4">Estoque Total</th>
@@ -79,10 +79,10 @@ export default function AdminCatalog() {
             </thead>
             <tbody className="divide-y divide-border-main">
               {filteredProducts.map((p) => (
-                <tr key={p.id} className="hover:bg-white/5 transition-colors">
+                <tr key={p.id} className="bg-surface-hover transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="size-10 rounded-lg bg-white/5 flex items-center justify-center text-text-secondary">
+                      <div className="size-10 rounded-lg bg-surface-subtle flex items-center justify-center text-text-secondary">
                         <Package size={24} />
                       </div>
                       <div className="flex flex-col">
@@ -114,7 +114,7 @@ export default function AdminCatalog() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="p-2 hover:bg-white/5 rounded-lg transition-colors text-text-secondary hover:text-brand-orange">
+                    <button className="p-2 bg-surface-hover rounded-lg transition-colors text-text-secondary hover:text-brand-orange">
                       <span className="material-symbols-outlined">edit</span>
                     </button>
                   </td>

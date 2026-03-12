@@ -88,7 +88,7 @@ export default function Reports() {
             <div className="p-2 bg-amber-500/10 rounded-lg text-amber-500">
               <Target size={24} />
             </div>
-            <span className="text-xs font-bold text-text-secondary flex items-center gap-1 bg-white/5 px-2 py-1 rounded-full border border-border-main">
+            <span className="text-xs font-bold text-text-secondary flex items-center gap-1 bg-surface-subtle px-2 py-1 rounded-full border border-border-main">
               Meta: 85%
             </span>
           </div>
@@ -123,12 +123,12 @@ export default function Reports() {
                     <stop offset="95%" stopColor="#FF7A18" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#2A2A35" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#A0A0B0', fontSize: 12}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#A0A0B0', fontSize: 12}} tickFormatter={(value) => `R$ ${value/1000}k`} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-main)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)', fontSize: 12}} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)', fontSize: 12}} tickFormatter={(value) => `R$ ${value/1000}k`} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#1A1A22', border: '1px solid #2A2A35', borderRadius: '8px', color: '#fff' }}
-                  itemStyle={{ color: '#fff' }}
+                  contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-main)', borderRadius: '12px', color: 'var(--text-primary)' }}
+                  itemStyle={{ color: 'var(--text-primary)' }}
                 />
                 <Area type="monotone" dataKey="vendas" stroke="#FF7A18" strokeWidth={3} fillOpacity={1} fill="url(#colorVendas)" />
               </AreaChart>
@@ -193,7 +193,7 @@ export default function Reports() {
           <div className="p-6 space-y-6">
             {loading ? (
               <div className="animate-pulse space-y-4">
-                {[1, 2, 3].map(i => <div key={i} className="h-20 bg-white/5 rounded-xl" />)}
+                {[1, 2, 3].map(i => <div key={i} className="h-20 bg-surface-subtle rounded-xl" />)}
               </div>
             ) : (Array.isArray(opinions) && opinions.length > 0) ? (
               opinions.map((op) => (
@@ -214,7 +214,7 @@ export default function Reports() {
                     {op.conteudo}
                   </p>
                   <div className="mt-2 flex items-center gap-2">
-                    <div className="size-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white">
+                    <div className="size-6 rounded-full bg-surface-subtle flex items-center justify-center text-[10px] font-bold text-text-primary">
                       {op.autor_nome?.charAt(0) || 'C'}
                     </div>
                     <span className="text-xs font-medium text-text-secondary">{op.autor_nome || 'Consultor'}</span>
@@ -243,7 +243,7 @@ export default function Reports() {
           <div className="p-6 space-y-4">
             {loading ? (
               <div className="animate-pulse space-y-4">
-                {[1, 2].map(i => <div key={i} className="h-24 bg-white/5 rounded-xl" />)}
+                {[1, 2].map(i => <div key={i} className="h-24 bg-surface-subtle rounded-xl" />)}
               </div>
             ) : (Array.isArray(insights) && insights.length > 0) ? (
               insights.map((insight) => (

@@ -42,22 +42,22 @@ export default function UserProfile({ user, onUpdateUser }: { user: any; onUpdat
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (user.type === 'client') {
-        try {
-          const response = await api.get("/clients/me");
-          if (response.data) {
-            setFormData(prev => ({
-              ...prev,
-              nome: response.data.nome,
-              email: response.data.email,
-              telefone: response.data.telefone || "",
-              whatsapp_numero: response.data.whatsapp_numero || "",
-              whatsapp_notificacoes_ativas: response.data.whatsapp_notificacoes_ativas === 1
-            }));
-          }
-        } catch (err) {
-          console.error("Erro ao buscar perfil:", err);
+      try {
+        const endpoint = user.type === 'client' ? "/clients/me" : "/users/me";
+        const response = await api.get(endpoint);
+        if (response.data) {
+          setFormData(prev => ({
+            ...prev,
+            nome: response.data.nome,
+            email: response.data.email,
+            telefone: response.data.telefone || "",
+            whatsapp_numero: response.data.whatsapp_numero || "",
+            whatsapp_notificacoes_ativas: response.data.whatsapp_notificacoes_ativas === 1,
+            avatar_url: response.data.avatar_url || ""
+          }));
         }
+      } catch (err) {
+        console.error("Erro ao buscar perfil:", err);
       }
     };
     fetchProfile();
@@ -73,7 +73,8 @@ export default function UserProfile({ user, onUpdateUser }: { user: any; onUpdat
   ];
 
   const handleAvatarSelect = (url: string) => {
-    onUpdateUser({ ...user, avatar: url });
+    setFormData(prev => ({ ...prev, avatar_url: url }));
+    onUpdateUser({ ...user, avatar_url: url });
     setShowAvatarPicker(false);
   };
 
@@ -87,7 +88,9 @@ export default function UserProfile({ user, onUpdateUser }: { user: any; onUpdat
       
       const reader = new FileReader();
       reader.onloadend = () => {
-        onUpdateUser({ ...user, avatar: reader.result as string });
+        const base64 = reader.result as string;
+        setFormData(prev => ({ ...prev, avatar_url: base64 }));
+        onUpdateUser({ ...user, avatar_url: base64 });
         setShowAvatarPicker(false);
       };
       reader.readAsDataURL(file);
@@ -98,15 +101,29 @@ export default function UserProfile({ user, onUpdateUser }: { user: any; onUpdat
     e.preventDefault();
     setLoading(true);
     try {
+      const endpoint = user.type === 'client' ? "/clients/me" : "/users/me";
+      const payload: any = {
+        nome: formData.nome,
+        email: formData.email,
+        avatar_url: formData.avatar_url
+      };
+
       if (user.type === 'client') {
-        await api.patch("/clients/me", {
-          nome: formData.nome,
-          email: formData.email,
-          telefone: formData.telefone,
-          whatsapp_numero: formData.whatsapp_numero,
-          whatsapp_notificacoes_ativas: formData.whatsapp_notificacoes_ativas
-        });
+        payload.telefone = formData.telefone;
+        payload.whatsapp_numero = formData.whatsapp_numero;
+        payload.whatsapp_notificacoes_ativas = formData.whatsapp_notificacoes_ativas;
       }
+
+      if (formData.novaSenha) {
+        if (formData.novaSenha !== formData.confirmarSenha) {
+          alert("As senhas não coincidem.");
+          setLoading(false);
+          return;
+        }
+        payload.senha = formData.novaSenha;
+      }
+
+      await api.patch(endpoint, payload);
       
       onUpdateUser({ 
         ...user, 
@@ -114,7 +131,8 @@ export default function UserProfile({ user, onUpdateUser }: { user: any; onUpdat
         empresa: formData.empresa, 
         email: formData.email,
         whatsapp_numero: formData.whatsapp_numero,
-        whatsapp_notificacoes_ativas: formData.whatsapp_notificacoes_ativas ? 1 : 0
+        whatsapp_notificacoes_ativas: formData.whatsapp_notificacoes_ativas ? 1 : 0,
+        avatar_url: formData.avatar_url
       });
       setIsEditing(false);
       alert("Perfil atualizado com sucesso!");
@@ -141,8 +159,8 @@ export default function UserProfile({ user, onUpdateUser }: { user: any; onUpdat
         <div className="w-full md:w-1/3 flex flex-col items-center space-y-6">
           <div className="relative group">
             <div className="size-40 rounded-3xl bg-slate-200 dark:bg-slate-800 overflow-hidden border-4 border-white dark:border-slate-900 shadow-2xl transition-transform group-hover:scale-[1.02]">
-              {user.avatar ? (
-                <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+              {user.avatar_url ? (
+                <img src={user.avatar_url} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-slate-400">
                   <User size={64} />
@@ -328,6 +346,8 @@ export default function UserProfile({ user, onUpdateUser }: { user: any; onUpdat
                       type="password"
                       placeholder="••••••••"
                       disabled={!isEditing}
+                      value={formData.novaSenha}
+                      onChange={(e) => setFormData({...formData, novaSenha: e.target.value})}
                       className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-primary transition-all"
                     />
                   </div>
@@ -337,6 +357,8 @@ export default function UserProfile({ user, onUpdateUser }: { user: any; onUpdat
                       type="password"
                       placeholder="••••••••"
                       disabled={!isEditing}
+                      value={formData.confirmarSenha}
+                      onChange={(e) => setFormData({...formData, confirmarSenha: e.target.value})}
                       className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-primary transition-all"
                     />
                   </div>

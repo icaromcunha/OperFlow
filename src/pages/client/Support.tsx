@@ -36,7 +36,7 @@ export default function Support() {
       case 'aberto': return 'bg-brand-orange/10 text-brand-orange border-brand-orange/20';
       case 'em atendimento': return 'bg-brand-purple/10 text-brand-purple border-brand-purple/20';
       case 'concluido': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
-      default: return 'bg-white/5 text-text-secondary border-border-main';
+      default: return 'bg-surface-subtle text-text-secondary border-border-main';
     }
   };
 
@@ -76,7 +76,7 @@ export default function Support() {
             className="w-full pl-12 pr-4 py-3 bg-bg-card border border-border-main rounded-xl focus:ring-2 focus:ring-brand-orange focus:border-brand-orange transition-all text-text-primary placeholder:text-text-secondary/50"
           />
         </div>
-        <button className="flex items-center gap-2 px-6 py-3 bg-bg-card border border-border-main rounded-xl font-bold text-text-secondary hover:bg-white/5 transition-colors">
+        <button className="flex items-center gap-2 px-6 py-3 bg-bg-card border border-border-main rounded-xl font-bold text-text-secondary bg-surface-hover transition-colors">
           <Filter size={20} />
           Filtros
         </button>
@@ -86,7 +86,7 @@ export default function Support() {
       <div className="bg-bg-card rounded-2xl border border-border-main shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-12 space-y-4">
-            {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-16 bg-white/5 animate-pulse rounded-xl" />)}
+            {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-16 bg-surface-subtle animate-pulse rounded-xl" />)}
           </div>
         ) : filteredProtocols.length > 0 ? (
           <div className="divide-y divide-border-main">
@@ -94,7 +94,7 @@ export default function Support() {
               <div 
                 key={protocol.id} 
                 onClick={() => navigate(`/protocols/${protocol.id}`)}
-                className="p-6 hover:bg-white/5 transition-colors cursor-pointer group"
+                className="p-6 bg-surface-hover transition-colors cursor-pointer group"
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-start gap-4">
@@ -113,7 +113,7 @@ export default function Support() {
                         <span className="flex items-center gap-1.5">
                           {getPriorityIcon(protocol.prioridade_nome)} {protocol.prioridade_nome}
                         </span>
-                        <span className="bg-white/5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter border border-border-main">
+                        <span className="bg-surface-subtle px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter border border-border-main">
                           {protocol.categoria_nome}
                         </span>
                       </div>
@@ -131,7 +131,7 @@ export default function Support() {
           </div>
         ) : (
           <div className="p-20 text-center">
-            <div className="size-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-border-main">
+            <div className="size-20 bg-surface-subtle rounded-full flex items-center justify-center mx-auto mb-6 border border-border-main">
               <MessageSquare className="text-text-secondary" size={40} />
             </div>
             <h3 className="text-xl font-bold text-text-primary mb-2">Nenhum protocolo encontrado</h3>

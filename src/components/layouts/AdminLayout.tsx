@@ -73,13 +73,12 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                 exit={{ opacity: 0, x: -20 }}
                 className="flex items-center gap-3 overflow-hidden whitespace-nowrap"
               >
-                <Logo className="size-10 shrink-0" />
-                <span className="font-bold text-xl tracking-tight uppercase italic text-text-primary">OperFlow</span>
+                <Logo className="w-52 h-auto shrink-0" />
               </motion.div>
             )}
           </AnimatePresence>
           {isCollapsed && (
-            <Logo className="size-10 mx-auto" />
+            <Logo className="w-12 h-auto mx-auto" />
           )}
         </div>
 
@@ -90,13 +89,13 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="p-4 bg-white/5 rounded-xl border border-border-main cursor-pointer hover:bg-white/10 transition-colors"
+                className="p-4 bg-surface-subtle rounded-xl border border-border-main cursor-pointer bg-surface-hover transition-colors"
                 onClick={() => navigate("/admin/profile")}
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="size-8 rounded-full bg-slate-700 overflow-hidden border border-white/20">
-                    {user.avatar ? (
-                      <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  <div className="size-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border border-border-main">
+                    {user.avatar_url ? (
+                      <img src={user.avatar_url} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-white"><User size={14} /></div>
                     )}
@@ -122,18 +121,18 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                 title={isCollapsed ? item.label : ""}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${
                   isActive 
-                    ? "bg-brand-purple text-white font-bold shadow-lg shadow-brand-purple/20" 
-                    : "text-text-secondary hover:bg-black/5 dark:hover:bg-white/5 hover:text-text-primary"
+                    ? "bg-brand-orange text-white font-bold shadow-lg shadow-brand-orange/20" 
+                    : "text-text-secondary hover:bg-surface-subtle hover:text-text-primary"
                 }`}
               >
-                <item.icon size={20} className={isActive ? "text-white shrink-0" : "text-text-secondary group-hover:text-white shrink-0"} />
+                <item.icon size={20} className={isActive ? "text-white shrink-0" : "text-text-secondary group-hover:text-brand-orange shrink-0"} />
                 <AnimatePresence>
                   {!isCollapsed && (
                     <motion.span
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -10 }}
-                      className="whitespace-nowrap text-sm"
+                      className="whitespace-nowrap text-sm font-semibold"
                     >
                       {item.label}
                     </motion.span>
@@ -148,7 +147,7 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
         <div className="px-4 mb-4">
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="w-full flex items-center justify-center p-3 rounded-xl bg-white/5 hover:bg-white/10 text-text-secondary hover:text-white transition-all"
+            className="w-full flex items-center justify-center p-3 rounded-xl bg-surface-subtle bg-surface-hover text-text-secondary hover:text-text-primary transition-all"
           >
             {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
           </button>
@@ -157,7 +156,7 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
         <div className="p-4 border-t border-border-main">
           <button
             onClick={onLogout}
-            className={`flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:text-brand-orange hover:bg-white/5 transition-all ${isCollapsed ? 'justify-center' : ''}`}
+            className={`flex items-center gap-3 px-4 py-3 w-full rounded-xl text-text-secondary hover:text-brand-orange bg-surface-hover transition-all ${isCollapsed ? 'justify-center' : ''}`}
           >
             <LogOut size={20} />
             {!isCollapsed && <span className="text-sm font-medium">Sair do Portal</span>}
@@ -187,7 +186,7 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
             <div className="relative">
               <button 
                 onClick={toggleDarkMode}
-                className="p-2.5 rounded-xl bg-bg-card border border-border-main text-text-secondary hover:bg-white/5 transition-colors"
+                className="p-2.5 rounded-xl bg-bg-card border border-border-main text-text-secondary bg-surface-hover transition-colors"
                 title="Alternar tema"
               >
                 <Sun className="hidden dark:block size-5" />
@@ -198,7 +197,7 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
             <div className="relative">
               <button 
                 onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                className="p-2.5 rounded-xl bg-bg-card border border-border-main text-text-secondary relative hover:bg-white/5 transition-colors"
+                className="p-2.5 rounded-xl bg-bg-card border border-border-main text-text-secondary relative bg-surface-hover transition-colors"
               >
                 <Bell size={22} />
                 <span className="absolute top-2 right-2 size-2.5 bg-brand-orange rounded-full border-2 border-bg-main"></span>
@@ -214,13 +213,13 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                 className="absolute right-0 mt-2 w-80 bg-bg-card rounded-2xl shadow-2xl border border-border-main z-50 overflow-hidden"
               >
-                <div className="p-4 border-b border-border-main flex justify-between items-center bg-white/5">
+                <div className="p-4 border-b border-border-main flex justify-between items-center bg-surface-subtle">
                   <h4 className="font-bold text-text-primary">Notificações Admin</h4>
                   <span className="text-[10px] font-black uppercase text-white bg-brand-purple px-2 py-0.5 rounded-full">3 Novas</span>
                 </div>
                 <div className="max-h-96 overflow-y-auto">
                   {notifications.map((n) => (
-                    <div key={n.id} className="p-4 border-b border-border-main hover:bg-white/5 transition-colors cursor-pointer group">
+                    <div key={n.id} className="p-4 border-b border-border-main bg-surface-hover transition-colors cursor-pointer group">
                       <div className="flex gap-3">
                         <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${
                           n.type === 'alert' ? 'bg-red-500/10 text-red-500' : 
@@ -240,7 +239,7 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                     </div>
                   ))}
                 </div>
-                <button className="w-full py-3 text-xs font-bold text-text-secondary hover:text-white transition-colors bg-white/5">
+                <button className="w-full py-3 text-xs font-bold text-text-secondary hover:text-text-primary transition-colors bg-surface-subtle">
                   Ver todas as notificações
                 </button>
               </motion.div>
@@ -255,9 +254,9 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
                 onClick={() => navigate("/admin/profile")}
                 className="size-10 rounded-full border border-border-main bg-bg-card flex items-center justify-center text-white font-bold overflow-hidden hover:border-brand-orange transition-colors"
               >
-                {user.avatar ? (
+                {user.avatar_url ? (
                   <img 
-                    src={user.avatar} 
+                    src={user.avatar_url} 
                     alt="Avatar" 
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover"
