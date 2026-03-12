@@ -87,29 +87,29 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
   };
 
   return (
-    <div className="relative min-h-screen bg-bg-main flex items-center justify-center p-6 md:p-12 transition-colors duration-200 overflow-hidden text-text-primary">
+    <div className="relative min-h-[100dvh] bg-bg-main flex items-center justify-center p-4 md:p-8 lg:p-12 transition-colors duration-200 overflow-hidden text-text-primary">
       {/* Decorative Elements */}
       <div className="pointer-events-none absolute -bottom-24 -left-24 size-96 bg-brand-orange/10 rounded-full blur-3xl" />
       <div className="pointer-events-none absolute -top-24 -right-24 size-96 bg-brand-purple/10 rounded-full blur-3xl" />
 
       <div className="w-full max-w-md relative z-10">
-        <div className="flex flex-col items-center mb-8">
-          <Logo className="w-full max-w-[420px] h-auto mb-4" variant="login" />
+        <div className="flex flex-col items-center mb-4 md:mb-6">
+          <Logo className="w-full max-w-[280px] md:max-w-[360px] h-auto mb-2" variant="login" />
         </div>
 
-        <div className="mb-10 text-center">
-          <h3 className="text-2xl font-black text-text-primary mb-1 tracking-tight uppercase italic">Acesso ao Portal</h3>
+        <div className="mb-6 md:mb-8 text-center">
+          <h3 className="text-xl md:text-2xl font-black text-text-primary mb-1 tracking-tight uppercase italic">Acesso ao Portal</h3>
           <p className="text-text-secondary font-bold text-[10px] uppercase tracking-[0.2em] opacity-60">Gerencie sua operação estratégica</p>
         </div>
 
         {error && (
-          <div className="mb-8 p-5 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded-2xl text-sm font-bold flex items-center gap-4 animate-in fade-in slide-in-from-top-2">
+          <div className="mb-4 md:mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded-2xl text-xs md:text-sm font-bold flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
             <div className="size-2.5 rounded-full bg-red-500 animate-pulse shrink-0" />
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
           <div className="space-y-3">
             <label className="text-[11px] font-black uppercase text-text-secondary tracking-widest ml-1" htmlFor="email">
               E-mail de Acesso
@@ -121,7 +121,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input-main w-full pl-12 py-5 font-semibold text-lg"
+                className="input-main w-full pl-12 py-4 md:py-5 font-semibold text-base md:text-lg"
                 placeholder="seu@email.com"
                 required
               />
@@ -142,7 +142,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
                 type={showPassword ? "text" : "password"}
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
-                className="input-main w-full pl-12 pr-14 py-5 font-semibold text-lg"
+                className="input-main w-full pl-12 pr-14 py-4 md:py-5 font-semibold text-base md:text-lg"
                 placeholder="••••••••"
                 required
               />
@@ -174,14 +174,14 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary w-full py-5 text-lg uppercase tracking-widest flex items-center justify-center gap-4"
+            className="btn-primary w-full py-4 md:py-5 text-base md:text-lg uppercase tracking-widest flex items-center justify-center gap-3 md:gap-4"
           >
             <span>{loading ? "Autenticando..." : "Entrar no Portal"}</span>
             {!loading && <LogIn size={22} />}
           </button>
         </form>
 
-        <div className="mt-16 flex items-center justify-between pt-8 border-t border-border-main">
+        <div className="mt-8 md:mt-10 flex items-center justify-between pt-4 md:pt-6 border-t border-border-main">
           <button 
             onClick={toggleDarkMode}
             className="flex items-center gap-3 text-sm font-bold text-text-secondary hover:text-brand-orange transition-colors group"
@@ -193,7 +193,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
             Alternar Tema
           </button>
           
-          <div className="flex items-center gap-2 text-xs font-bold text-text-secondary/50 uppercase tracking-widest">
+          <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-text-secondary/50 uppercase tracking-widest">
             <ShieldCheck size={14} />
             Acesso Seguro
           </div>
