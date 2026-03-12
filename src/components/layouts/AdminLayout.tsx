@@ -52,7 +52,6 @@ export default function AdminLayout({ user, onLogout }: { user: any; onLogout: (
     { path: "/admin/clients", label: "Clientes", icon: Store },
     ...(user.perfil === 'admin' ? [
       { path: "/admin/team", label: "Equipe", icon: Users },
-      { path: "/admin/settings", label: "Configurações", icon: Settings },
     ] : []),
   ];
 

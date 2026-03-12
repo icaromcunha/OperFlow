@@ -15,12 +15,28 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
   const navigate = useNavigate();
   const { toggleDarkMode } = useTheme();
 
   const trySupabaseDirectLogin = async (email: string, senha: string) => {
     if (!isSupabaseEnabled || !supabase) {
       return null;
+    }
+
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password: senha });
+    if (!authError && authData.user) {
+      return {
+        token: authData.session?.access_token || `sb-auth-${authData.user.id}-${Date.now()}`,
+        user: {
+          id: authData.user.id,
+          nome: authData.user.user_metadata?.nome || authData.user.email || "Usuário",
+          email: authData.user.email,
+          type: authData.user.user_metadata?.type || "client",
+          empresa_id: authData.user.user_metadata?.empresa_id || null,
+        },
+      };
     }
 
     const { data: sbUser } = await supabase
@@ -65,10 +81,42 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
     return null;
   };
 
+  const handleForgotPassword = async () => {
+    setError("");
+    setInfo("");
+
+    if (!email) {
+      setError("Informe seu e-mail para receber o link de redefinição.");
+      return;
+    }
+
+    if (!isSupabaseEnabled || !supabase) {
+      setError("Reset por e-mail indisponível: integração Supabase não configurada.");
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (resetError) {
+        setError(resetError.message || "Não foi possível enviar o e-mail de redefinição.");
+        return;
+      }
+
+      setInfo("Enviamos um link de redefinição para seu e-mail.");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setInfo("");
 
     const payload = { email, senha };
     const configuredBase = (api.defaults.baseURL || "/api").toString().replace(/\/$/, "");
@@ -164,6 +212,12 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
           </div>
         )}
 
+        {info && (
+          <div className="mb-4 md:mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-2xl text-xs md:text-sm font-bold">
+            {info}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
           <div className="space-y-3">
             <label className="text-[11px] font-black uppercase text-text-secondary tracking-widest ml-1" htmlFor="email">
@@ -188,7 +242,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
               <label className="text-[11px] font-black uppercase text-text-secondary tracking-widest" htmlFor="password">
                 Senha
               </label>
-              <button type="button" className="text-[11px] font-black uppercase text-brand-orange hover:underline tracking-wider">Esqueci a senha</button>
+              <button type="button" onClick={handleForgotPassword} disabled={resetLoading} className="text-[11px] font-black uppercase text-brand-orange hover:underline tracking-wider disabled:opacity-60">{resetLoading ? "Enviando..." : "Esqueci a senha"}</button>
             </div>
             <div className="relative group">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary size-5 group-focus-within:text-brand-orange transition-colors" />

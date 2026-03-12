@@ -21,6 +21,7 @@ import AdminReports from "./pages/admin/Reports";
 import AdminTeam from "./pages/admin/Team";
 import AdminSettings from "./pages/admin/Settings";
 import Login from "./pages/shared/Login";
+import ResetPassword from "./pages/shared/ResetPassword";
 import ClientDashboard from "./pages/client/Dashboard";
 import CreateProtocol from "./pages/client/CreateProtocol";
 import ClientProtocolDetail from "./pages/client/ProtocolDetail";
@@ -65,6 +66,7 @@ export default function App() {
         <Routes>
           {/* Unified Login Route */}
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={user?.type === 'admin' ? <AdminLayout user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}>
