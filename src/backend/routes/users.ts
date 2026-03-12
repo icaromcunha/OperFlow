@@ -24,8 +24,13 @@ router.post("/", authenticate, async (req: any, res) => {
   }
 
   const { nome, email, senha, perfil: novoPerfil } = req.body;
+
+  if (!nome || !email) {
+    return res.status(400).json({ error: "Nome e e-mail são obrigatórios." });
+  }
+
   const hashedPassword = await bcrypt.hash(senha || '123456', 10);
-  
+
   try {
     const result = db.prepare(`
       INSERT INTO usuarios (empresa_id, nome, email, senha, perfil, status)
@@ -34,6 +39,9 @@ router.post("/", authenticate, async (req: any, res) => {
     
     res.status(201).json({ id: result.lastInsertRowid });
   } catch (err: any) {
+    if (String(err.message || "").includes("UNIQUE constraint failed")) {
+      return res.status(409).json({ error: "E-mail já cadastrado para outro usuário." });
+    }
     res.status(500).json({ error: err.message });
   }
 });
@@ -66,6 +74,9 @@ router.patch("/me", authenticate, async (req: any, res) => {
     
     res.json({ success: true });
   } catch (err: any) {
+    if (String(err.message || "").includes("UNIQUE constraint failed")) {
+      return res.status(409).json({ error: "E-mail já cadastrado para outro usuário." });
+    }
     res.status(500).json({ error: err.message });
   }
 });

@@ -55,15 +55,15 @@ export default function AdminTeam() {
     if (!nome) return;
     const email = prompt("E-mail do consultor:");
     if (!email) return;
-    const senha = prompt("Senha (padrão 123456):") || "123456";
-    
+    const senha = prompt("Senha inicial (padrão 123456):") || "123456";
+
     try {
       await api.post("/users", { nome, email, senha, perfil: 'consultor' });
-      fetchTeam();
+      await fetchTeam();
       alert("Consultor adicionado com sucesso!");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Erro ao adicionar consultor.");
+      alert(err?.response?.data?.error || "Erro ao adicionar consultor.");
     }
   };
 

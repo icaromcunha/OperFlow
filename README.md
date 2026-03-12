@@ -18,3 +18,13 @@ View your app in AI Studio: https://ai.studio/apps/eb700811-5ed8-4a77-ab66-fcea9
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+
+## Deploy / Login 404 troubleshooting
+
+If login returns `Request failed with status code 404`, your frontend is loading but the API route is missing.
+
+- Default frontend behavior is to call `/api/auth/login` on the same domain.
+- If backend is hosted in another domain, set `VITE_API_BASE_URL` (example: `https://api.operflow.app/api`).
+- Make sure your reverse proxy forwards `/api/*` to the Node/Express server.
+

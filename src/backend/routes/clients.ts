@@ -2,6 +2,7 @@ import express from "express";
 import db from "../db";
 import { authenticate } from "../middleware/auth";
 import { supabase, isSupabaseEnabled } from "../supabase";
+import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
@@ -32,14 +33,20 @@ router.post("/", authenticate, async (req: any, res) => {
     return res.status(403).json({ error: "Apenas administradores ou consultores podem criar clientes." });
   }
 
-  const { nome, email, status, whatsapp_numero, consultor_id } = req.body;
-  
+  const { nome, email, senha, status, whatsapp_numero, consultor_id } = req.body;
+
+  if (!nome || !email) {
+    return res.status(400).json({ error: "Nome e e-mail são obrigatórios." });
+  }
+
   try {
+    const hashedPassword = await bcrypt.hash(senha || '123456', 10);
+
     const result = db.prepare(`
-      INSERT INTO clientes (empresa_id, nome, email, status, whatsapp_numero, consultor_id, data_criacao)
+      INSERT INTO clientes (empresa_id, nome, email, senha, status, whatsapp_numero, consultor_id)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(empresa_id, nome, email, status || 'ativo', whatsapp_numero || null, consultor_id || null, new Date().toISOString());
-    
+    `).run(empresa_id, nome, email, hashedPassword, status || 'ativo', whatsapp_numero || null, consultor_id || null);
+
     const clientId = result.lastInsertRowid;
 
     // Sync to Supabase if enabled
@@ -62,6 +69,9 @@ router.post("/", authenticate, async (req: any, res) => {
 
     res.status(201).json({ id: clientId });
   } catch (err: any) {
+    if (String(err.message || "").includes("UNIQUE constraint failed")) {
+      return res.status(409).json({ error: "E-mail já cadastrado para outro cliente." });
+    }
     res.status(500).json({ error: err.message });
   }
 });

@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+import axios from "axios";
+import bcrypt from "bcryptjs";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn, Eye, EyeOff, Sun, Moon, ArrowRight, ShieldCheck } from "lucide-react";
 import api from "../../services/api";
+import { supabase, isSupabaseEnabled } from "../../services/supabase";
 import { useTheme } from "../../components/ThemeProvider";
 import { Logo } from "../../components/ui/Logo";
 
@@ -12,17 +15,157 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
   const navigate = useNavigate();
   const { toggleDarkMode } = useTheme();
+
+  const trySupabaseDirectLogin = async (email: string, senha: string) => {
+    if (!isSupabaseEnabled || !supabase) {
+      return null;
+    }
+
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password: senha });
+    if (!authError && authData.user) {
+      return {
+        token: authData.session?.access_token || `sb-auth-${authData.user.id}-${Date.now()}`,
+        user: {
+          id: authData.user.id,
+          nome: authData.user.user_metadata?.nome || authData.user.email || "Usuário",
+          email: authData.user.email,
+          type: authData.user.user_metadata?.type || "client",
+          empresa_id: authData.user.user_metadata?.empresa_id || null,
+        },
+      };
+    }
+
+    const { data: sbUser } = await supabase
+      .from("usuarios")
+      .select("id, empresa_id, nome, email, perfil, senha")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (sbUser && bcrypt.compareSync(senha, sbUser.senha)) {
+      return {
+        token: `sb-direct-admin-${sbUser.id}-${Date.now()}`,
+        user: {
+          id: sbUser.id,
+          nome: sbUser.nome,
+          email: sbUser.email,
+          type: "admin",
+          perfil: sbUser.perfil,
+          empresa_id: sbUser.empresa_id,
+        },
+      };
+    }
+
+    const { data: sbClient } = await supabase
+      .from("clientes")
+      .select("id, empresa_id, nome, email, senha")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (sbClient && bcrypt.compareSync(senha, sbClient.senha)) {
+      return {
+        token: `sb-direct-client-${sbClient.id}-${Date.now()}`,
+        user: {
+          id: sbClient.id,
+          nome: sbClient.nome,
+          email: sbClient.email,
+          type: "client",
+          empresa_id: sbClient.empresa_id,
+        },
+      };
+    }
+
+    return null;
+  };
+
+  const handleForgotPassword = async () => {
+    setError("");
+    setInfo("");
+
+    if (!email) {
+      setError("Informe seu e-mail para receber o link de redefinição.");
+      return;
+    }
+
+    if (!isSupabaseEnabled || !supabase) {
+      setError("Reset por e-mail indisponível: integração Supabase não configurada.");
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (resetError) {
+        setError(resetError.message || "Não foi possível enviar o e-mail de redefinição.");
+        return;
+      }
+
+      setInfo("Enviamos um link de redefinição para seu e-mail.");
+    } finally {
+      setResetLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setInfo("");
+
+    const payload = { email, senha };
+    const configuredBase = (api.defaults.baseURL || "/api").toString().replace(/\/$/, "");
+    const candidateUrls = [
+      `${configuredBase}/auth/login`,
+      "/api/auth/login",
+      "https://operflow.app/api/auth/login",
+      "https://api.operflow.app/api/auth/login",
+      "https://api.operflow.app/auth/login",
+      "/auth/login",
+    ].filter((value, index, array) => array.indexOf(value) === index);
+
+    let lastError: any;
+
     try {
-      const response = await api.post("/auth/login", { email, senha });
+      let response: any = null;
+
+      for (const url of candidateUrls) {
+        try {
+          response = await axios.post(url, payload);
+          break;
+        } catch (candidateError: any) {
+          const status = candidateError?.response?.status;
+          lastError = candidateError;
+
+          // Keep trying alternative endpoints for route/proxy/CORS/network mismatches
+          if (!status || status === 404 || status >= 500) {
+            continue;
+          }
+
+          // 4xx (except 404) usually means endpoint exists and credentials/request are invalid
+          throw candidateError;
+        }
+      }
+
+      if (!response) {
+        const supabaseFallback = await trySupabaseDirectLogin(email, senha);
+
+        if (supabaseFallback) {
+          response = { data: supabaseFallback };
+        } else {
+          const attemptedRoutes = candidateUrls.join(", ");
+          setError(`Não foi possível autenticar via API nem Supabase direto. Rotas testadas: ${attemptedRoutes}. Verifique deploy do backend, proxy e políticas do Supabase.`);
+          return;
+        }
+      }
+
       const { token, user } = response.data;
-      
+
       if (rememberMe) {
         localStorage.setItem("remembered_email", email);
       } else {
@@ -31,14 +174,14 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
 
       localStorage.setItem("token", token);
       onLogin(user);
-      
-      if (user.type === 'admin') {
+
+      if (user.type === "admin") {
         navigate("/admin");
       } else {
         navigate("/");
       }
     } catch (err: any) {
-      console.error("Login Error:", err);
+      console.error("Login Error:", err || lastError);
       const errorMessage = err.response?.data?.error || err.message || "Erro ao fazer login. Verifique suas credenciais.";
       setError(errorMessage);
     } finally {
@@ -47,29 +190,35 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
   };
 
   return (
-    <div className="min-h-screen bg-bg-main flex items-center justify-center p-6 md:p-12 transition-colors duration-200 overflow-hidden text-text-primary">
+    <div className="relative min-h-[100dvh] bg-bg-main flex items-center justify-center p-4 md:p-8 lg:p-12 transition-colors duration-200 overflow-hidden text-text-primary">
       {/* Decorative Elements */}
-      <div className="absolute -bottom-24 -left-24 size-96 bg-brand-orange/10 rounded-full blur-3xl" />
-      <div className="absolute -top-24 -right-24 size-96 bg-brand-purple/10 rounded-full blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -left-24 size-96 bg-brand-orange/10 rounded-full blur-3xl" />
+      <div className="pointer-events-none absolute -top-24 -right-24 size-96 bg-brand-purple/10 rounded-full blur-3xl" />
 
       <div className="w-full max-w-md relative z-10">
-        <div className="flex flex-col items-center mb-8">
-          <Logo className="w-full max-w-[420px] h-auto mb-4" variant="login" />
+        <div className="flex flex-col items-center mb-4 md:mb-6">
+          <Logo className="w-full max-w-[280px] md:max-w-[360px] h-auto mb-2" variant="login" />
         </div>
 
-        <div className="mb-10 text-center">
-          <h3 className="text-2xl font-black text-text-primary mb-1 tracking-tight uppercase italic">Acesso ao Portal</h3>
+        <div className="mb-6 md:mb-8 text-center">
+          <h3 className="text-xl md:text-2xl font-black text-text-primary mb-1 tracking-tight uppercase italic">Acesso ao Portal</h3>
           <p className="text-text-secondary font-bold text-[10px] uppercase tracking-[0.2em] opacity-60">Gerencie sua operação estratégica</p>
         </div>
 
         {error && (
-          <div className="mb-8 p-5 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded-2xl text-sm font-bold flex items-center gap-4 animate-in fade-in slide-in-from-top-2">
+          <div className="mb-4 md:mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded-2xl text-xs md:text-sm font-bold flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
             <div className="size-2.5 rounded-full bg-red-500 animate-pulse shrink-0" />
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        {info && (
+          <div className="mb-4 md:mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-2xl text-xs md:text-sm font-bold">
+            {info}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
           <div className="space-y-3">
             <label className="text-[11px] font-black uppercase text-text-secondary tracking-widest ml-1" htmlFor="email">
               E-mail de Acesso
@@ -81,7 +230,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input-main w-full pl-12 py-5 font-semibold text-lg"
+                className="input-main w-full pl-12 py-4 md:py-5 font-semibold text-base md:text-lg"
                 placeholder="seu@email.com"
                 required
               />
@@ -93,7 +242,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
               <label className="text-[11px] font-black uppercase text-text-secondary tracking-widest" htmlFor="password">
                 Senha
               </label>
-              <button type="button" className="text-[11px] font-black uppercase text-brand-orange hover:underline tracking-wider">Esqueci a senha</button>
+              <button type="button" onClick={handleForgotPassword} disabled={resetLoading} className="text-[11px] font-black uppercase text-brand-orange hover:underline tracking-wider disabled:opacity-60">{resetLoading ? "Enviando..." : "Esqueci a senha"}</button>
             </div>
             <div className="relative group">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary size-5 group-focus-within:text-brand-orange transition-colors" />
@@ -102,7 +251,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
                 type={showPassword ? "text" : "password"}
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
-                className="input-main w-full pl-12 pr-14 py-5 font-semibold text-lg"
+                className="input-main w-full pl-12 pr-14 py-4 md:py-5 font-semibold text-base md:text-lg"
                 placeholder="••••••••"
                 required
               />
@@ -134,14 +283,14 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary w-full py-5 text-lg uppercase tracking-widest flex items-center justify-center gap-4"
+            className="btn-primary w-full py-4 md:py-5 text-base md:text-lg uppercase tracking-widest flex items-center justify-center gap-3 md:gap-4"
           >
             <span>{loading ? "Autenticando..." : "Entrar no Portal"}</span>
             {!loading && <LogIn size={22} />}
           </button>
         </form>
 
-        <div className="mt-16 flex items-center justify-between pt-8 border-t border-border-main">
+        <div className="mt-8 md:mt-10 flex items-center justify-between pt-4 md:pt-6 border-t border-border-main">
           <button 
             onClick={toggleDarkMode}
             className="flex items-center gap-3 text-sm font-bold text-text-secondary hover:text-brand-orange transition-colors group"
@@ -153,7 +302,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
             Alternar Tema
           </button>
           
-          <div className="flex items-center gap-2 text-xs font-bold text-text-secondary/50 uppercase tracking-widest">
+          <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-text-secondary/50 uppercase tracking-widest">
             <ShieldCheck size={14} />
             Acesso Seguro
           </div>

@@ -22,14 +22,15 @@ export default function ClientList() {
     if (!nome) return;
     const email = prompt("E-mail do cliente:");
     if (!email) return;
-    
+    const senha = prompt("Senha inicial (padrão 123456):") || "123456";
+
     try {
-      await api.post("/clients", { nome, email, status: 'ativo' });
+      await api.post("/clients", { nome, email, senha, status: 'ativo' });
       await refreshClients();
       alert("Cliente adicionado com sucesso!");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Erro ao adicionar cliente.");
+      alert(err?.response?.data?.error || "Erro ao adicionar cliente.");
     }
   };
 
